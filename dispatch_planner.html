@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch Planner — uHarvest</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1916;
+    --text-secondary: #6b6860;
+    --accent: #2d6a4f;
+    --accent-light: #d8f3dc;
+    --accent-mid: #52b788;
+    --warn: #e76f51;
+    --warn-light: #fde8e2;
+    --info: #457b9d;
+    --info-light: #e8f4f8;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  header {
+    background: var(--accent);
+    color: white;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  header span { font-size: 12px; opacity: 0.7; font-family: var(--mono); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+
+  input, select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, select:focus { border-color: var(--accent-mid); }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #235c41; }
+  .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
+  .btn-secondary:hover { border-color: var(--accent-mid); }
+  .btn-warn { background: var(--warn); color: white; }
+
+  .file-upload {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .file-upload:hover { border-color: var(--accent-mid); }
+  .file-upload input { display: none; }
+  .file-upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .file-upload-text { font-size: 13px; color: var(--text-secondary); }
+  .file-upload-text strong { color: var(--accent); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .tag-green { background: var(--accent-light); color: var(--accent); }
+  .tag-red { background: var(--warn-light); color: var(--warn); }
+  .tag-blue { background: var(--info-light); color: var(--info); }
+  .tag-gray { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+
+  .stat {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+  }
+
+  .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+  .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .route-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .route-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .route-header:hover { background: #eeece6; }
+
+  .route-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .route-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-secondary); }
+
+  .route-body { padding: 16px; display: none; }
+  .route-body.open { display: block; }
+
+  .stop-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stop-row:last-child { border-bottom: none; }
+
+  .stop-num {
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .stop-name { font-size: 13px; font-weight: 500; }
+  .stop-customer { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .stop-details { margin-left: auto; text-align: right; }
+  .stop-eta { font-size: 12px; font-family: var(--mono); color: var(--accent); }
+  .stop-kg { font-size: 11px; color: var(--text-secondary); }
+
+  .dispatch-badge {
+    background: var(--accent);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent-mid);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .alert-warn { background: var(--warn-light); color: var(--warn); border: 1px solid #f4a58a; }
+  .alert-info { background: var(--info-light); color: var(--info); border: 1px solid #a8d1e7; }
+  .alert-success { background: var(--accent-light); color: var(--accent); border: 1px solid #95d5b2; }
+
+  .step-indicator {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .step.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .step.done { color: var(--accent-mid); border-bottom-color: var(--accent-mid); }
+
+  .hidden { display: none; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+
+  .vehicle-select { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+  .vehicle-btn {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+  }
+
+  .vehicle-btn:hover { border-color: var(--accent-mid); }
+  .vehicle-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+  .vehicle-btn .v-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .vehicle-btn .v-cap { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  #loading {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-secondary);
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .unmatched-table { max-height: 200px; overflow-y: auto; }
+
+  .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+  #panel-1, #panel-2, #panel-3 { display: none; }
+  #panel-1.active, #panel-2.active, #panel-3.active { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🥦 Dispatch Planner</h1>
+  <span>uHarvest Operations</span>
+</header>
+
+<div class="container">
+
+  <div class="step-indicator">
+    <div class="step active" id="step-1">1 — Upload Orders</div>
+    <div class="step" id="step-2">2 — Configure</div>
+    <div class="step" id="step-3">3 — Routes & Dispatch</div>
+  </div>
+
+  <!-- PANEL 1: Upload -->
+  <div id="panel-1" class="active">
+    <div class="card">
+      <div class="card-title">Daily Order Sheet</div>
+      <div class="alert alert-info">
+        Upload your daily order CSV with columns: <strong>Outlet Name, Customer Name, Total Kg, ETA</strong> — or use the master database directly for a demo.
+      </div>
+
+      <label class="file-upload" id="upload-zone">
+        <input type="file" id="order-file" accept=".csv">
+        <div class="file-upload-icon">📂</div>
+        <div class="file-upload-text">
+          <strong>Click to upload</strong> daily order CSV<br>
+          Outlet Name · Customer Name · Total Kg · ETA
+        </div>
+      </label>
+
+      <div id="upload-status" class="hidden" style="margin-top:12px;"></div>
+
+      <div style="margin-top: 16px; text-align: center; color: var(--text-secondary); font-size: 12px;">— or —</div>
+
+      <div style="margin-top: 12px; text-align: center;">
+        <button class="btn btn-secondary" onclick="useMasterAsDemo()">Use all outlets from master database (demo)</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="goToStep2()" id="btn-next-1" disabled>Next: Configure →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 2: Configure -->
+  <div id="panel-2">
+    <div class="card">
+      <div class="card-title">Vehicle Fleet Available</div>
+      <div class="alert alert-info" style="margin-bottom:12px;">The tool will automatically assign the <strong>best-fit vehicle</strong> to each route based on its total load. Check or uncheck which vehicles are available today.</div>
+      <div class="vehicle-select" id="vehicle-select">
+        <div class="vehicle-btn selected" data-cap="552" data-name="EV 650" onclick="toggleVehicle(this)">
+          <div style="font-size:16px;margin-bottom:4px;">✅</div>
+          <div class="v-name">EV 650</div>
+          <div class="v-cap">552 kg net</div>
+        </div>
+        <div class="vehicle-btn selected" data-cap="688" data-name="TATA ACE" onclick="toggleVehicle(this)">
+          <div style="font-size:16px;margin-bottom:4px;">✅</div>
+          <div class="v-name">TATA ACE</div>
+          <div class="v-cap">688 kg net</div>
+        </div>
+        <div class="vehicle-btn selected" data-cap="1032" data-name="Bolero" onclick="toggleVehicle(this)">
+          <div style="font-size:16px;margin-bottom:4px;">✅</div>
+          <div class="v-name">Bolero</div>
+          <div class="v-cap">1032 kg net</div>
+        </div>
+        <div class="vehicle-btn selected" data-cap="1800" data-name="TATA 407" onclick="toggleVehicle(this)">
+          <div style="font-size:16px;margin-bottom:4px;">✅</div>
+          <div class="v-name">TATA 407</div>
+          <div class="v-cap">1800 kg net</div>
+        </div>
+        <div class="vehicle-btn selected" data-cap="3150" data-name="3.5 Tonner" onclick="toggleVehicle(this)">
+          <div style="font-size:16px;margin-bottom:4px;">✅</div>
+          <div class="v-name">3.5 Tonner</div>
+          <div class="v-cap">3150 kg net</div>
+        </div>
+      </div>
+      <div style="margin-top:8px; font-size:11px; color:var(--text-secondary);">Capacities shown after buffer deduction (12-15% for smaller, 10% for larger vehicles)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Time Buffers</div>
+      <div class="grid-4">
+        <div>
+          <label>Unloading per stop (min)</label>
+          <input type="number" id="buf-unload" value="20" min="5" max="60">
+        </div>
+        <div>
+          <label>Loading at warehouse (min)</label>
+          <input type="number" id="buf-load" value="30" min="10" max="90">
+        </div>
+        <div>
+          <label>Pre-departure (min)</label>
+          <input type="number" id="buf-predep" value="15" min="5" max="30">
+        </div>
+        <div>
+          <label>Traffic buffer (%)</label>
+          <input type="number" id="buf-traffic" value="20" min="0" max="50">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Routing Settings</div>
+      <div class="grid-3">
+        <div>
+          <label>Average speed in city (km/h)</label>
+          <input type="number" id="avg-speed" value="28" min="15" max="60">
+        </div>
+        <div>
+          <label>Max stops per vehicle</label>
+          <input type="number" id="max-stops" value="12" min="3" max="30">
+        </div>
+        <div>
+          <label>Delivery date</label>
+          <input type="date" id="delivery-date">
+        </div>
+      </div>
+    </div>
+
+    <div id="unmatched-section" class="hidden">
+      <div class="card">
+        <div class="card-title">⚠️ Unmatched Outlets</div>
+        <div class="alert alert-warn">These outlets from your order sheet couldn't be matched to the master database. They will be skipped.</div>
+        <div class="unmatched-table">
+          <table>
+            <thead><tr><th>Outlet Name from Order Sheet</th><th>Closest Match Found</th><th>Action</th></tr></thead>
+            <tbody id="unmatched-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="goToStep1()">← Back</button>
+      <button class="btn btn-primary" onclick="generateRoutes()">Generate Routes →</button>
+    </div>
+  </div>
+
+  <!-- PANEL 3: Results -->
+  <div id="panel-3">
+    <div id="loading" class="hidden">
+      <div class="spinner"></div>
+      <div>Calculating optimal routes...</div>
+    </div>
+
+    <div id="results-content" class="hidden">
+      <div class="stat-grid" id="summary-stats"></div>
+
+      <div class="alert alert-success" id="summary-text"></div>
+
+      <div class="card">
+        <div class="card-title">Vehicle Routes & Dispatch Schedule</div>
+        <div id="routes-container"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="goToStep1()">← Start Over</button>
+        <button class="btn btn-primary" onclick="exportToCSV()">⬇ Export to Excel/CSV</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── Master Data (embedded from your sheet) ───────────────────────────────
+const MASTER_DB = [{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower B","address":"Tower-B,Sector-15 Part-II , Village Silokhera , Unitech Signature Tower-II , Gurgaon-122001 , Haryana-06","lat":28.46095,"lon":77.04836,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Tower C - GOVO","address":"Tower C Unitech Cyber Park Sector 39 Gurugram Haryana 122003","lat":28.41312,"lon":77.11731,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower D","address":"Tower-D,Sector-15 Part-II , Village Silokhera , Unitech Signature Tower-II , Gurgaon-122001 , Haryana-06","lat":28.46154,"lon":77.04937,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"AMEX","address":"American Express Bld Sector-74A Gurugram-122004","lat":28.40398,"lon":77.00242,"eta":"3:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"GOC -TIP-2","address":"Tower C Unitech Cyber Park Sector 39 Gurugram Haryana 122003","lat":28.41290,"lon":77.11735,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-14)","outlet":"DANA CHOGA (SEC-14)","address":"DANA CHOGA (SEC-14) HUDA MARKET, SECTOR-14, GURGAON","lat":28.46508,"lon":77.02754,"eta":"12:00:00 PM"},{"customer":"Dana Choga Foods And Hospitality PVT LTD","outlet":"Dana Choga (Sec-14) New","address":"HUDA Market, Sector 14, Gurugram, Haryana 122001","lat":28.46508,"lon":77.02754,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-22)","outlet":"DANA CHOGA (SEC-22)","address":"Shop No 1 to 5, Local Shopping Complex, Sector 22, Gurugram, Haryana 122015","lat":28.48208,"lon":77.04065,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE Nirvana","outlet":"DANA CHOGA Nirvana","address":"Nirvana country, Sector 50, Gurugram, Haryana 122018","lat":28.42180,"lon":77.09621,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE","outlet":"DANA CHOGA DLF Phase 4","address":"DLF Phase 4, Gurugram, Haryana","lat":28.47120,"lon":77.09280,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE (SEC-47)","outlet":"DANA CHOGA (SEC-47)","address":"Sector 47, Gurugram, Haryana","lat":28.43060,"lon":77.07680,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-54)","outlet":"DANA CHOGA (SEC-54)","address":"Sector 54, Gurugram, Haryana","lat":28.43270,"lon":77.10140,"eta":"12:00:00 PM"}];
+
+const WAREHOUSE = { lat: 28.9385425, lon: 77.0825831 };
+
+const VEHICLES = [
+  { name: 'EV 650', capacity: 552 },
+  { name: 'TATA ACE', capacity: 688 },
+  { name: 'Bolero', capacity: 1032 },
+  { name: 'TATA 407', capacity: 1800 },
+  { name: '3.5 Tonner', capacity: 3150 }
+];
+
+let currentOrders = [];
+let selectedVehicle = { name: 'EV 650', capacity: 552 };
+let generatedRoutes = [];
+
+// ─── Haversine distance ───────────────────────────────────────────────────
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Road distance with correction factor
+function roadDistance(lat1, lon1, lat2, lon2) {
+  return haversine(lat1, lon1, lat2, lon2) * 1.35;
+}
+
+// ─── Fuzzy match ─────────────────────────────────────────────────────────
+function similarity(a, b) {
+  a = a.toLowerCase().replace(/[^a-z0-9]/g, '');
+  b = b.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (a === b) return 1;
+  if (a.includes(b) || b.includes(a)) return 0.85;
+  let matches = 0;
+  const shorter = a.length < b.length ? a : b;
+  const longer = a.length < b.length ? b : a;
+  for (let i = 0; i < shorter.length - 2; i++) {
+    if (longer.includes(shorter.slice(i, i+3))) matches++;
+  }
+  return matches / Math.max(shorter.length, 1);
+}
+
+function findBestMatch(name, masterList) {
+  let best = null, bestScore = 0;
+  for (const m of masterList) {
+    const s1 = similarity(name, m.outlet);
+    const s2 = similarity(name, m.customer);
+    const score = Math.max(s1, s2);
+    if (score > bestScore) { bestScore = score; best = m; }
+  }
+  return { match: best, score: bestScore };
+}
+
+// ─── ETA to minutes from midnight ────────────────────────────────────────
+function etaToMinutes(eta) {
+  if (!eta || eta === '-' || eta === 'nan' || eta === 'Closed') return null;
+  const m = eta.match(/(\d+):(\d+)(?::(\d+))?\s*(AM|PM)?/i);
+  if (!m) return null;
+  let h = parseInt(m[1]), min = parseInt(m[2]);
+  const ampm = m[4] ? m[4].toUpperCase() : '';
+  if (ampm === 'PM' && h !== 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function minutesToTime(mins) {
+  if (mins < 0) mins += 24 * 60;
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 === 0 ? 12 : h % 12;
+  return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+// ─── Nearest neighbour clustering ────────────────────────────────────────
+function clusterOutlets(orders, vehicleCap, maxStops) {
+  let remaining = [...orders];
+  const routes = [];
+
+  while (remaining.length > 0) {
+    const route = [];
+    let loadKg = 0;
+    let currentLat = WAREHOUSE.lat;
+    let currentLon = WAREHOUSE.lon;
+
+    while (remaining.length > 0 && route.length < maxStops) {
+      // Find nearest unvisited that fits
+      let bestIdx = -1, bestDist = Infinity;
+      for (let i = 0; i < remaining.length; i++) {
+        const o = remaining[i];
+        const kg = o.totalKg || 50; // default 50kg if not specified
+        if (loadKg + kg > vehicleCap) continue;
+        const d = haversine(currentLat, currentLon, o.lat, o.lon);
+        if (d < bestDist) { bestDist = d; bestIdx = i; }
+      }
+
+      if (bestIdx === -1) break; // nothing fits
+
+      const chosen = remaining.splice(bestIdx, 1)[0];
+      route.push(chosen);
+      loadKg += chosen.totalKg || 50;
+      currentLat = chosen.lat;
+      currentLon = chosen.lon;
+    }
+
+    if (route.length > 0) routes.push({ stops: route, loadKg });
+  }
+
+  return routes;
+}
+
+// ─── Calculate dispatch time for a route ─────────────────────────────────
+function calcDispatch(route) {
+  const speed = parseFloat(document.getElementById('avg-speed').value) || 28;
+  const trafficPct = parseFloat(document.getElementById('buf-traffic').value) || 20;
+  const unloadMin = parseFloat(document.getElementById('buf-unload').value) || 20;
+  const loadMin = parseFloat(document.getElementById('buf-load').value) || 30;
+  const predepMin = parseFloat(document.getElementById('buf-predep').value) || 15;
+
+  // Sort stops by ETA (earliest first)
+  const sorted = [...route.stops].sort((a, b) => {
+    const ea = etaToMinutes(a.eta) || 9999;
+    const eb = etaToMinutes(b.eta) || 9999;
+    return ea - eb;
+  });
+
+  // Calculate total travel time from warehouse through all stops
+  let totalTravelKm = 0;
+  let prevLat = WAREHOUSE.lat, prevLon = WAREHOUSE.lon;
+  for (const s of sorted) {
+    totalTravelKm += roadDistance(prevLat, prevLon, s.lat, s.lon);
+    prevLat = s.lat; prevLon = s.lon;
+  }
+
+  const travelMin = (totalTravelKm / speed) * 60 * (1 + trafficPct / 100);
+  const totalUnload = unloadMin * sorted.length;
+  const totalBuffer = loadMin + predepMin;
+
+  // Dispatch time = tightest ETA - travel - unloading - loading - predep
+  const tightestETA = sorted.reduce((min, s) => {
+    const e = etaToMinutes(s.eta);
+    return e !== null && e < min ? e : min;
+  }, 9999);
+
+  const dispatchMins = tightestETA - travelMin - totalUnload - totalBuffer;
+  const vehicleReadyMins = dispatchMins - 40; // 40 min before dispatch
+
+  return {
+    stops: sorted,
+    travelKm: totalTravelKm,
+    travelMin,
+    totalUnload,
+    dispatchTime: minutesToTime(Math.round(dispatchMins)),
+    vehicleReadyTime: minutesToTime(Math.round(vehicleReadyMins)),
+    tightestETA: minutesToTime(tightestETA),
+    dispatchMins
+  };
+}
+
+// ─── UI helpers ──────────────────────────────────────────────────────────
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`step-${i}`).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    document.getElementById(`panel-${i}`).className = i === n ? 'active' : '';
+  });
+}
+
+function goToStep1() { setStep(1); }
+function goToStep2() { setStep(2); showUnmatched(); }
+function goToStep3() { setStep(3); }
+
+function toggleVehicle(el) {
+  el.classList.toggle('selected');
+  const icon = el.querySelector('div');
+  icon.textContent = el.classList.contains('selected') ? '✅' : '☐';
+}
+
+function getAvailableVehicles() {
+  const btns = document.querySelectorAll('.vehicle-btn.selected');
+  return Array.from(btns).map(b => ({
+    name: b.dataset.name,
+    capacity: parseFloat(b.dataset.cap)
+  })).sort((a, b) => a.capacity - b.capacity);
+}
+
+function bestFitVehicle(loadKg, available) {
+  for (const v of available) {
+    if (v.capacity >= loadKg) return v;
+  }
+  return available[available.length - 1];
+}
+
+// ─── File upload ─────────────────────────────────────────────────────────
+document.getElementById('upload-zone').addEventListener('click', () => {
+  document.getElementById('order-file').click();
+});
+
+document.getElementById('order-file').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    parseOrderCSV(text, file.name);
+  };
+  reader.readAsText(file);
+});
+
+function parseOrderCSV(text, filename) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+
+  const outletIdx = headers.findIndex(h => h.includes('outlet'));
+  const customerIdx = headers.findIndex(h => h.includes('customer'));
+  const kgIdx = headers.findIndex(h => h.includes('kg') || h.includes('weight') || h.includes('qty'));
+  const etaIdx = headers.findIndex(h => h.includes('eta') || h.includes('time'));
+
+  const orders = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim().replace(/"/g,''));
+    if (!cols[outletIdx]) continue;
+    orders.push({
+      outletName: cols[outletIdx] || '',
+      customerName: cols[customerIdx] || '',
+      totalKg: parseFloat(cols[kgIdx]) || 50,
+      etaRaw: cols[etaIdx] || '12:00:00 PM'
+    });
+  }
+
+  processOrders(orders);
+  document.getElementById('upload-status').className = '';
+  document.getElementById('upload-status').innerHTML = `<div class="alert alert-success">✅ Loaded <strong>${orders.length} orders</strong> from ${filename}</div>`;
+  document.getElementById('btn-next-1').disabled = false;
+}
+
+function useMasterAsDemo() {
+  const valid = MASTER_DB.filter(o => o.eta && o.eta !== '-' && o.eta !== 'nan' && o.eta !== 'Closed');
+  currentOrders = valid.map(o => ({
+    ...o,
+    outletName: o.outlet,
+    customerName: o.customer,
+    totalKg: Math.floor(Math.random() * 150) + 30, // random kg for demo
+    etaRaw: o.eta,
+    matched: true
+  }));
+  document.getElementById('upload-status').className = '';
+  document.getElementById('upload-status').innerHTML = `<div class="alert alert-success">✅ Loaded <strong>${currentOrders.length} outlets</strong> from master database (demo mode — random kg assigned)</div>`;
+  document.getElementById('btn-next-1').disabled = false;
+}
+
+function processOrders(orders) {
+  currentOrders = [];
+  for (const o of orders) {
+    const { match, score } = findBestMatch(o.outletName, MASTER_DB);
+    if (match && score > 0.4) {
+      currentOrders.push({
+        ...match,
+        outletName: o.outletName,
+        totalKg: o.totalKg,
+        etaRaw: o.etaRaw || match.eta,
+        eta: o.etaRaw || match.eta,
+        score,
+        matched: true
+      });
+    } else {
+      currentOrders.push({ ...o, matched: false, matchName: match ? match.outlet : 'No match' });
+    }
+  }
+}
+
+function showUnmatched() {
+  const unmatched = currentOrders.filter(o => !o.matched);
+  if (unmatched.length === 0) {
+    document.getElementById('unmatched-section').classList.add('hidden');
+    return;
+  }
+  document.getElementById('unmatched-section').classList.remove('hidden');
+  const tbody = document.getElementById('unmatched-body');
+  tbody.innerHTML = unmatched.map(o => `
+    <tr>
+      <td>${o.outletName || o.outlet || '-'}</td>
+      <td style="color:var(--text-secondary)">${o.matchName || '-'}</td>
+      <td><span class="tag tag-red">Skipped</span></td>
+    </tr>
+  `).join('');
+}
+
+// ─── Generate routes ─────────────────────────────────────────────────────
+function generateRoutes() {
+  goToStep3();
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('results-content').classList.add('hidden');
+
+  setTimeout(() => {
+    const matched = currentOrders.filter(o => o.matched !== false && o.lat && o.lon);
+    const maxStops = parseInt(document.getElementById('max-stops').value) || 12;
+    const available = getAvailableVehicles();
+
+    if (available.length === 0) {
+      alert('Please select at least one vehicle type.');
+      goToStep2();
+      return;
+    }
+
+    // Use largest available vehicle for clustering (to minimise number of routes)
+    const largestCap = available[available.length - 1].capacity;
+    const clusters = clusterOutlets(matched, largestCap, maxStops);
+
+    generatedRoutes = clusters.map((c, i) => {
+      const fit = bestFitVehicle(c.loadKg, available);
+      return {
+        id: i + 1,
+        vehicle: fit.name,
+        capacity: fit.capacity,
+        ...calcDispatch(c),
+        loadKg: c.loadKg
+      };
+    });
+
+    renderResults(generatedRoutes, matched.length);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('results-content').classList.remove('hidden');
+  }, 800);
+}
+
+function renderResults(routes, totalOutlets) {
+  const totalKg = routes.reduce((s, r) => s + r.loadKg, 0);
+  const earliestDispatch = routes.reduce((min, r) => r.dispatchMins < min ? r.dispatchMins : min, 9999);
+
+  // Vehicle mix count
+  const vehicleMix = {};
+  routes.forEach(r => { vehicleMix[r.vehicle] = (vehicleMix[r.vehicle] || 0) + 1; });
+  const mixText = Object.entries(vehicleMix).map(([v, c]) => `${c}x ${v}`).join(', ');
+
+  document.getElementById('summary-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Vehicles Needed</div><div class="stat-value">${routes.length}</div><div class="stat-sub">${mixText}</div></div>
+    <div class="stat"><div class="stat-label">Total Outlets</div><div class="stat-value">${totalOutlets}</div><div class="stat-sub">across all routes</div></div>
+    <div class="stat"><div class="stat-label">Total Load</div><div class="stat-value">${Math.round(totalKg)}</div><div class="stat-sub">kg dispatched</div></div>
+    <div class="stat"><div class="stat-label">First Dispatch</div><div class="stat-value">${minutesToTime(Math.round(earliestDispatch))}</div><div class="stat-sub">earliest vehicle</div></div>
+  `;
+
+  document.getElementById('summary-text').innerHTML =
+    `✅ Generated <strong>${routes.length} routes</strong> covering <strong>${totalOutlets} outlets</strong>. Vehicle mix: <strong>${mixText}</strong>.`;
+
+  const container = document.getElementById('routes-container');
+  container.innerHTML = routes.map((r, i) => {
+    const loadPct = Math.round((r.loadKg / r.capacity) * 100);
+    return `
+      <div class="route-card">
+        <div class="route-header" onclick="toggleRoute(${i})">
+          <div class="route-title">
+            🚛 Vehicle ${r.id}
+            <span class="tag tag-green">${r.stops.length} stops</span>
+            <span class="tag tag-blue">${Math.round(r.loadKg)} kg</span>
+          </div>
+          <div class="route-meta">
+            <span>Ready by <strong>${r.vehicleReadyTime}</strong></span>
+            <span class="dispatch-badge">Dispatch ${r.dispatchTime}</span>
+            <span>▼</span>
+          </div>
+        </div>
+        <div class="route-body" id="route-body-${i}">
+          <div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);">
+            <span>🛣 ${Math.round(r.travelKm)} km road distance</span>
+            <span>⏱ ~${Math.round(r.travelMin)} min travel</span>
+            <span>📦 Load: ${loadPct}% of capacity</span>
+            <span>⚡ Vehicle ready by ${r.vehicleReadyTime}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${loadPct}%"></div></div>
+          <div style="margin-top:12px;">
+            ${r.stops.map((s, si) => `
+              <div class="stop-row">
+                <div class="stop-num">${si + 1}</div>
+                <div>
+                  <div class="stop-name">${s.outlet || s.outletName}</div>
+                  <div class="stop-customer">${s.customer || s.customerName}</div>
+                  <div class="stop-customer" style="margin-top:2px;font-size:10px;">${s.address ? s.address.substring(0,60)+'...' : ''}</div>
+                </div>
+                <div class="stop-details">
+                  <div class="stop-eta">ETA ${s.eta || s.etaRaw}</div>
+                  <div class="stop-kg">${s.totalKg ? Math.round(s.totalKg)+' kg' : ''}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleRoute(i) {
+  const body = document.getElementById(`route-body-${i}`);
+  body.classList.toggle('open');
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────
+function exportToCSV() {
+  const rows = [['Vehicle', 'Stop No.', 'Customer Name', 'Outlet Name', 'Address', 'ETA', 'Total Kg', 'Dispatch Time', 'Vehicle Ready Time', 'Route Distance (km)', 'Route Load (kg)']];
+
+  for (const r of generatedRoutes) {
+    r.stops.forEach((s, i) => {
+      rows.push([
+        `Vehicle ${r.id} (${r.vehicle})`,
+        i + 1,
+        s.customer || s.customerName,
+        s.outlet || s.outletName,
+        s.address || '',
+        s.eta || s.etaRaw,
+        s.totalKg || '',
+        r.dispatchTime,
+        r.vehicleReadyTime,
+        Math.round(r.travelKm),
+        Math.round(r.loadKg)
+      ]);
+    });
+  }
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const date = document.getElementById('delivery-date').value || new Date().toISOString().slice(0,10);
+  a.download = `dispatch_plan_${date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Set today's date
+document.getElementById('delivery-date').value = new Date().toISOString().slice(0,10);
+</script>
+</body>
+</html>
