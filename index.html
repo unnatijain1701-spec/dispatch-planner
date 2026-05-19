@@ -552,9 +552,13 @@ function minutesToTime(mins) {
 }
 
 // ─── Nearest neighbour clustering ────────────────────────────────────────
-function clusterOutlets(orders, vehicleCap, maxStops) {
+function clusterOutlets(orders, vehicleCap, maxStops, available) {
   let remaining = [...orders];
   const routes = [];
+
+  // Sort available vehicles smallest to largest
+  const sortedVehicles = [...available].sort((a, b) => a.capacity - b.capacity);
+  const smallestCap = sortedVehicles[0].capacity;
 
   while (remaining.length > 0) {
     const route = [];
@@ -562,20 +566,44 @@ function clusterOutlets(orders, vehicleCap, maxStops) {
     let currentLat = WAREHOUSE.lat;
     let currentLon = WAREHOUSE.lon;
 
+    // Determine target capacity for this route:
+    // Start by trying to fill a small zone cluster (up to smallest vehicle cap)
+    // This naturally creates varied load sizes across routes
+    const zoneRadius = 15; // km — try to keep stops within 15km of each other
+    let firstStop = null;
+
     while (remaining.length > 0 && route.length < maxStops) {
-      // Find nearest unvisited that fits
       let bestIdx = -1, bestDist = Infinity;
       for (let i = 0; i < remaining.length; i++) {
         const o = remaining[i];
-        const kg = o.totalKg || 50; // default 50kg if not specified
+        const kg = o.totalKg || 50;
         if (loadKg + kg > vehicleCap) continue;
+
+        // If we have a first stop, prefer outlets within zone radius
+        const distFromFirst = firstStop
+          ? haversine(firstStop.lat, firstStop.lon, o.lat, o.lon)
+          : 0;
+        if (firstStop && distFromFirst > zoneRadius && loadKg < smallestCap) continue;
+
         const d = haversine(currentLat, currentLon, o.lat, o.lon);
         if (d < bestDist) { bestDist = d; bestIdx = i; }
       }
 
-      if (bestIdx === -1) break; // nothing fits
+      // If nothing found within zone, open up to any remaining
+      if (bestIdx === -1) {
+        for (let i = 0; i < remaining.length; i++) {
+          const o = remaining[i];
+          const kg = o.totalKg || 50;
+          if (loadKg + kg > vehicleCap) continue;
+          const d = haversine(currentLat, currentLon, o.lat, o.lon);
+          if (d < bestDist) { bestDist = d; bestIdx = i; }
+        }
+      }
+
+      if (bestIdx === -1) break;
 
       const chosen = remaining.splice(bestIdx, 1)[0];
+      if (!firstStop) firstStop = chosen;
       route.push(chosen);
       loadKg += chosen.totalKg || 50;
       currentLat = chosen.lat;
@@ -783,7 +811,7 @@ function generateRoutes() {
 
     // Use largest available vehicle for clustering (to minimise number of routes)
     const largestCap = available[available.length - 1].capacity;
-    const clusters = clusterOutlets(matched, largestCap, maxStops);
+    const clusters = clusterOutlets(matched, largestCap, maxStops, available);
 
     generatedRoutes = clusters.map((c, i) => {
       const fit = bestFitVehicle(c.loadKg, available);
