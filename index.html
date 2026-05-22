@@ -22,6 +22,7 @@
     --info-light: #e8f4f8;
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
+    --sidebar-width: 240px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,16 +38,143 @@
   header {
     background: var(--accent);
     color: white;
-    padding: 16px 32px;
+    padding: 0 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
-  header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
-  header span { font-size: 12px; opacity: 0.7; font-family: var(--mono); }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  header .header-right { display: flex; align-items: center; gap: 10px; }
+  header span.ver { font-size: 12px; opacity: 0.6; font-family: var(--mono); }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+  .btn-export-top {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    color: white;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-export-top:hover { background: rgba(255,255,255,0.25); }
+  .btn-export-top svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .btn-export-top.visible { display: flex; }
+
+  /* Layout: sidebar + main */
+  .app-body {
+    display: flex;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar.visible { display: flex; }
+
+  .sidebar-header {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 10;
+  }
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .sidebar-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  .sidebar-search:focus { border-color: var(--accent-mid); }
+
+  .zone-list { padding: 8px 0; }
+
+  .zone-item {
+    padding: 9px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+  }
+  .zone-item:hover { background: var(--bg); }
+  .zone-item.active {
+    background: var(--accent-light);
+    border-left-color: var(--accent);
+  }
+  .zone-item.active .zone-name { color: var(--accent); font-weight: 600; }
+
+  .zone-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .zone-badge {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 10px;
+    font-family: var(--mono);
+    padding: 1px 6px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  .zone-item.active .zone-badge {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .zone-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 24px 32px;
+    max-width: 100%;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; }
 
   .card {
     background: var(--surface);
@@ -101,7 +229,6 @@
   .btn-primary:hover { background: #235c41; }
   .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
   .btn-secondary:hover { border-color: var(--accent-mid); }
-  .btn-warn { background: var(--warn); color: white; }
 
   .file-upload {
     border: 2px dashed var(--border);
@@ -111,7 +238,6 @@
     cursor: pointer;
     transition: border-color 0.15s;
   }
-
   .file-upload:hover { border-color: var(--accent-mid); }
   .file-upload input { display: none; }
   .file-upload-icon { font-size: 28px; margin-bottom: 8px; }
@@ -125,21 +251,18 @@
     font-size: 11px;
     font-weight: 500;
   }
-
   .tag-green { background: var(--accent-light); color: var(--accent); }
   .tag-red { background: var(--warn-light); color: var(--warn); }
   .tag-blue { background: var(--info-light); color: var(--info); }
   .tag-gray { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
 
   .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-
   .stat {
     background: var(--bg);
     border-radius: 10px;
     padding: 14px 16px;
     border: 1px solid var(--border);
   }
-
   .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
   .stat-value { font-size: 22px; font-weight: 600; color: var(--text); font-family: var(--mono); }
   .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
@@ -149,7 +272,9 @@
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 12px;
+    transition: border-color 0.15s;
   }
+  .route-card:hover { border-color: var(--accent-mid); }
 
   .route-header {
     display: flex;
@@ -160,9 +285,7 @@
     border-bottom: 1px solid var(--border);
     cursor: pointer;
   }
-
   .route-header:hover { background: #eeece6; }
-
   .route-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
   .route-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-secondary); }
 
@@ -176,9 +299,7 @@
     padding: 8px 0;
     border-bottom: 1px solid var(--border);
   }
-
   .stop-row:last-child { border-bottom: none; }
-
   .stop-num {
     min-width: 24px;
     height: 24px;
@@ -193,10 +314,9 @@
     flex-shrink: 0;
     margin-top: 1px;
   }
-
   .stop-name { font-size: 13px; font-weight: 500; }
   .stop-customer { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-  .stop-details { margin-left: auto; text-align: right; }
+  .stop-details { margin-left: auto; text-align: right; flex-shrink: 0; }
   .stop-eta { font-size: 12px; font-family: var(--mono); color: var(--accent); }
   .stop-kg { font-size: 11px; color: var(--text-secondary); }
 
@@ -217,7 +337,6 @@
     overflow: hidden;
     margin-top: 6px;
   }
-
   .progress-fill {
     height: 100%;
     background: var(--accent-mid);
@@ -231,7 +350,6 @@
     font-size: 13px;
     margin-bottom: 12px;
   }
-
   .alert-warn { background: var(--warn-light); color: var(--warn); border: 1px solid #f4a58a; }
   .alert-info { background: var(--info-light); color: var(--info); border: 1px solid #a8d1e7; }
   .alert-success { background: var(--accent-light); color: var(--accent); border: 1px solid #95d5b2; }
@@ -241,7 +359,6 @@
     gap: 0;
     margin-bottom: 24px;
   }
-
   .step {
     flex: 1;
     text-align: center;
@@ -251,7 +368,6 @@
     border-bottom: 2px solid var(--border);
     transition: all 0.2s;
   }
-
   .step.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
   .step.done { color: var(--accent-mid); border-bottom-color: var(--accent-mid); }
 
@@ -264,7 +380,6 @@
   tr:hover td { background: var(--bg); }
 
   .vehicle-select { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-
   .vehicle-btn {
     border: 1.5px solid var(--border);
     border-radius: 8px;
@@ -274,7 +389,6 @@
     transition: all 0.15s;
     background: var(--bg);
   }
-
   .vehicle-btn:hover { border-color: var(--accent-mid); }
   .vehicle-btn.selected { border-color: var(--accent); background: var(--accent-light); }
   .vehicle-btn .v-name { font-size: 12px; font-weight: 600; color: var(--text); }
@@ -285,7 +399,6 @@
     padding: 48px;
     color: var(--text-secondary);
   }
-
   .spinner {
     width: 32px;
     height: 32px;
@@ -295,199 +408,327 @@
     animation: spin 0.8s linear infinite;
     margin: 0 auto 12px;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .unmatched-table { max-height: 200px; overflow-y: auto; }
-
   .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 
   #panel-1, #panel-2, #panel-3 { display: none; }
   #panel-1.active, #panel-2.active, #panel-3.active { display: block; }
+
+  /* Zone filter bar in results */
+  .zone-filter-bar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .zone-filter-bar.visible { display: flex; }
+  .zone-filter-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .zone-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--sans);
+    color: var(--text);
+  }
+  .zone-pill:hover { border-color: var(--accent-mid); }
+  .zone-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .zone-pill-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Route zone label */
+  .route-zone-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .no-routes-msg {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+  .no-routes-msg strong { display: block; font-size: 16px; color: var(--text); margin-bottom: 6px; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🥦 Dispatch Planner</h1>
-  <span>uHarvest Operations</span>
+  <div class="header-right">
+    <button class="btn-export-top" id="btn-export-top" onclick="exportToCSV()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </button>
+    <span class="ver">uHarvest Ops</span>
+  </div>
 </header>
 
-<div class="container">
+<div class="app-body">
 
-  <div class="step-indicator">
-    <div class="step active" id="step-1">1 — Upload Orders</div>
-    <div class="step" id="step-2">2 — Configure</div>
-    <div class="step" id="step-3">3 — Routes & Dispatch</div>
+  <!-- ZONE SIDEBAR (visible only in step 3) -->
+  <div class="sidebar" id="zone-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Zones</div>
+      <input class="sidebar-search" id="zone-search" type="text" placeholder="Search zone…" oninput="filterZoneList(this.value)">
+    </div>
+    <div class="zone-list" id="zone-list"></div>
   </div>
 
-  <!-- PANEL 1: Upload -->
-  <div id="panel-1" class="active">
-    <div class="card">
-      <div class="card-title">Daily Order Sheet</div>
-      <div class="alert alert-info">
-        Upload your daily order CSV with columns: <strong>Outlet Name, Customer Name, Total Kg, ETA</strong> — or use the master database directly for a demo.
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="container">
+
+      <div class="step-indicator">
+        <div class="step active" id="step-1">1 — Upload Orders</div>
+        <div class="step" id="step-2">2 — Configure</div>
+        <div class="step" id="step-3">3 — Routes & Dispatch</div>
       </div>
 
-      <label class="file-upload" id="upload-zone">
-        <input type="file" id="order-file" accept=".csv">
-        <div class="file-upload-icon">📂</div>
-        <div class="file-upload-text">
-          <strong>Click to upload</strong> daily order CSV<br>
-          Outlet Name · Customer Name · Total Kg · ETA
+      <!-- PANEL 1 -->
+      <div id="panel-1" class="active">
+        <div class="card">
+          <div class="card-title">Daily Order Sheet</div>
+          <div class="alert alert-info">
+            Upload your daily order CSV with columns: <strong>Outlet Name, Customer Name, Total Kg, ETA</strong> — or use the master database directly for a demo.
+          </div>
+          <label class="file-upload" id="upload-zone">
+            <input type="file" id="order-file" accept=".csv">
+            <div class="file-upload-icon">📂</div>
+            <div class="file-upload-text">
+              <strong>Click to upload</strong> daily order CSV<br>
+              Outlet Name · Customer Name · Total Kg · ETA
+            </div>
+          </label>
+          <div id="upload-status" class="hidden" style="margin-top:12px;"></div>
+          <div style="margin-top: 16px; text-align: center; color: var(--text-secondary); font-size: 12px;">— or —</div>
+          <div style="margin-top: 12px; text-align: center;">
+            <button class="btn btn-secondary" onclick="useMasterAsDemo()">Use all outlets from master database (demo)</button>
+          </div>
         </div>
-      </label>
-
-      <div id="upload-status" class="hidden" style="margin-top:12px;"></div>
-
-      <div style="margin-top: 16px; text-align: center; color: var(--text-secondary); font-size: 12px;">— or —</div>
-
-      <div style="margin-top: 12px; text-align: center;">
-        <button class="btn btn-secondary" onclick="useMasterAsDemo()">Use all outlets from master database (demo)</button>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="goToStep2()" id="btn-next-1" disabled>Next: Configure →</button>
+        </div>
       </div>
-    </div>
 
-    <div class="actions">
-      <button class="btn btn-primary" onclick="goToStep2()" id="btn-next-1" disabled>Next: Configure →</button>
+      <!-- PANEL 2 -->
+      <div id="panel-2">
+        <div class="card">
+          <div class="card-title">Vehicle Fleet Available</div>
+          <div class="alert alert-info" style="margin-bottom:12px;">The tool will automatically assign the <strong>best-fit vehicle</strong> to each route based on its total load.</div>
+          <div class="vehicle-select" id="vehicle-select">
+            <div class="vehicle-btn selected" data-cap="552" data-name="EV 650" onclick="toggleVehicle(this)">
+              <div style="font-size:16px;margin-bottom:4px;">✅</div>
+              <div class="v-name">EV 650</div>
+              <div class="v-cap">552 kg net</div>
+            </div>
+            <div class="vehicle-btn selected" data-cap="688" data-name="TATA ACE" onclick="toggleVehicle(this)">
+              <div style="font-size:16px;margin-bottom:4px;">✅</div>
+              <div class="v-name">TATA ACE</div>
+              <div class="v-cap">688 kg net</div>
+            </div>
+            <div class="vehicle-btn selected" data-cap="1032" data-name="Bolero" onclick="toggleVehicle(this)">
+              <div style="font-size:16px;margin-bottom:4px;">✅</div>
+              <div class="v-name">Bolero</div>
+              <div class="v-cap">1032 kg net</div>
+            </div>
+            <div class="vehicle-btn selected" data-cap="1800" data-name="TATA 407" onclick="toggleVehicle(this)">
+              <div style="font-size:16px;margin-bottom:4px;">✅</div>
+              <div class="v-name">TATA 407</div>
+              <div class="v-cap">1800 kg net</div>
+            </div>
+            <div class="vehicle-btn selected" data-cap="3150" data-name="3.5 Tonner" onclick="toggleVehicle(this)">
+              <div style="font-size:16px;margin-bottom:4px;">✅</div>
+              <div class="v-name">3.5 Tonner</div>
+              <div class="v-cap">3150 kg net</div>
+            </div>
+          </div>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-secondary);">Capacities shown after buffer deduction</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Time Buffers</div>
+          <div class="grid-4">
+            <div><label>Unloading per stop (min)</label><input type="number" id="buf-unload" value="20" min="5" max="60"></div>
+            <div><label>Loading at warehouse (min)</label><input type="number" id="buf-load" value="30" min="10" max="90"></div>
+            <div><label>Pre-departure (min)</label><input type="number" id="buf-predep" value="15" min="5" max="30"></div>
+            <div><label>Traffic buffer (%)</label><input type="number" id="buf-traffic" value="20" min="0" max="50"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Routing Settings</div>
+          <div class="grid-2">
+            <div><label>Average speed in city (km/h)</label><input type="number" id="avg-speed" value="28" min="15" max="60"></div>
+            <div><label>Delivery date</label><input type="date" id="delivery-date"></div>
+          </div>
+        </div>
+
+        <div id="unmatched-section" class="hidden">
+          <div class="card">
+            <div class="card-title">⚠️ Unmatched Outlets</div>
+            <div class="alert alert-warn">These outlets couldn't be matched to the master database and will be skipped.</div>
+            <div class="unmatched-table">
+              <table>
+                <thead><tr><th>Outlet Name from Order Sheet</th><th>Closest Match Found</th><th>Action</th></tr></thead>
+                <tbody id="unmatched-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="goToStep1()">← Back</button>
+          <button class="btn btn-primary" onclick="generateRoutes()">Generate Routes →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 3 -->
+      <div id="panel-3">
+        <div id="loading" class="hidden">
+          <div class="spinner"></div>
+          <div>Calculating optimal routes...</div>
+        </div>
+
+        <div id="results-content" class="hidden">
+          <div class="stat-grid" id="summary-stats"></div>
+          <div class="alert alert-success" id="summary-text"></div>
+
+          <!-- Zone filter pills -->
+          <div class="zone-filter-bar" id="zone-filter-bar">
+            <span class="zone-filter-label">Zone:</span>
+            <div id="zone-pills"></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <div class="card-title" style="margin-bottom:0;" id="routes-card-title">Vehicle Routes & Dispatch Schedule</div>
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="exportToCSV()">⬇ Export CSV</button>
+            </div>
+            <div id="routes-container"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="goToStep1()">← Start Over</button>
+            <button class="btn btn-primary" onclick="exportToCSV()">⬇ Export to Excel/CSV</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
-
-  <!-- PANEL 2: Configure -->
-  <div id="panel-2">
-    <div class="card">
-      <div class="card-title">Vehicle Fleet Available</div>
-      <div class="alert alert-info" style="margin-bottom:12px;">The tool will automatically assign the <strong>best-fit vehicle</strong> to each route based on its total load. Check or uncheck which vehicles are available today.</div>
-      <div class="vehicle-select" id="vehicle-select">
-        <div class="vehicle-btn selected" data-cap="552" data-name="EV 650" onclick="toggleVehicle(this)">
-          <div style="font-size:16px;margin-bottom:4px;">✅</div>
-          <div class="v-name">EV 650</div>
-          <div class="v-cap">552 kg net</div>
-        </div>
-        <div class="vehicle-btn selected" data-cap="688" data-name="TATA ACE" onclick="toggleVehicle(this)">
-          <div style="font-size:16px;margin-bottom:4px;">✅</div>
-          <div class="v-name">TATA ACE</div>
-          <div class="v-cap">688 kg net</div>
-        </div>
-        <div class="vehicle-btn selected" data-cap="1032" data-name="Bolero" onclick="toggleVehicle(this)">
-          <div style="font-size:16px;margin-bottom:4px;">✅</div>
-          <div class="v-name">Bolero</div>
-          <div class="v-cap">1032 kg net</div>
-        </div>
-        <div class="vehicle-btn selected" data-cap="1800" data-name="TATA 407" onclick="toggleVehicle(this)">
-          <div style="font-size:16px;margin-bottom:4px;">✅</div>
-          <div class="v-name">TATA 407</div>
-          <div class="v-cap">1800 kg net</div>
-        </div>
-        <div class="vehicle-btn selected" data-cap="3150" data-name="3.5 Tonner" onclick="toggleVehicle(this)">
-          <div style="font-size:16px;margin-bottom:4px;">✅</div>
-          <div class="v-name">3.5 Tonner</div>
-          <div class="v-cap">3150 kg net</div>
-        </div>
-      </div>
-      <div style="margin-top:8px; font-size:11px; color:var(--text-secondary);">Capacities shown after buffer deduction (12-15% for smaller, 10% for larger vehicles)</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Time Buffers</div>
-      <div class="grid-4">
-        <div>
-          <label>Unloading per stop (min)</label>
-          <input type="number" id="buf-unload" value="20" min="5" max="60">
-        </div>
-        <div>
-          <label>Loading at warehouse (min)</label>
-          <input type="number" id="buf-load" value="30" min="10" max="90">
-        </div>
-        <div>
-          <label>Pre-departure (min)</label>
-          <input type="number" id="buf-predep" value="15" min="5" max="30">
-        </div>
-        <div>
-          <label>Traffic buffer (%)</label>
-          <input type="number" id="buf-traffic" value="20" min="0" max="50">
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Routing Settings</div>
-      <div class="grid-2">
-        <div>
-          <label>Average speed in city (km/h)</label>
-          <input type="number" id="avg-speed" value="28" min="15" max="60">
-        </div>
-
-        <div>
-          <label>Delivery date</label>
-          <input type="date" id="delivery-date">
-        </div>
-      </div>
-    </div>
-
-    <div id="unmatched-section" class="hidden">
-      <div class="card">
-        <div class="card-title">⚠️ Unmatched Outlets</div>
-        <div class="alert alert-warn">These outlets from your order sheet couldn't be matched to the master database. They will be skipped.</div>
-        <div class="unmatched-table">
-          <table>
-            <thead><tr><th>Outlet Name from Order Sheet</th><th>Closest Match Found</th><th>Action</th></tr></thead>
-            <tbody id="unmatched-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-secondary" onclick="goToStep1()">← Back</button>
-      <button class="btn btn-primary" onclick="generateRoutes()">Generate Routes →</button>
-    </div>
-  </div>
-
-  <!-- PANEL 3: Results -->
-  <div id="panel-3">
-    <div id="loading" class="hidden">
-      <div class="spinner"></div>
-      <div>Calculating optimal routes...</div>
-    </div>
-
-    <div id="results-content" class="hidden">
-      <div class="stat-grid" id="summary-stats"></div>
-
-      <div class="alert alert-success" id="summary-text"></div>
-
-      <div class="card">
-        <div class="card-title">Vehicle Routes & Dispatch Schedule</div>
-        <div id="routes-container"></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-secondary" onclick="goToStep1()">← Start Over</button>
-        <button class="btn btn-primary" onclick="exportToCSV()">⬇ Export to Excel/CSV</button>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-// ─── Master Data (embedded from your sheet) ───────────────────────────────
-const MASTER_DB = [{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower B","address":"Tower-B,Sector-15 Part-II , Village Silokhera , Unitech Signature Tower-II , Gurgaon-122001 , Haryana-06","lat":28.46095,"lon":77.04836,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Tower C - GOVO","address":"TATA INTELLION PARK KHEWAT NO. 221/274 VILLAGE BEHRAMPUR , GURUGRAM-122004 , Haryana-06","lat":28.41312,"lon":77.11731,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower D","address":"L6 - L9, Signature Towers III,Tower B (SIGD), Sector 15,Part II,B1,B2,GF -L10,Kitchen , Cafe in L1 , Gurgaon-122002 , Haryana-06","lat":28.46154,"lon":77.04937,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"AMEX","address":"Sub Tehsil Kadipur , Sector 74A, Manesar Urban Complex Begumpur Khatola , Gurgaon - 122005 , , GURGAON-122005 , Haryana-06","lat":28.40398,"lon":77.00242,"eta":"3:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"GOC -TIP-2","address":"Tata Intellion Park,Khewat No.221/274,Village Behrampur Golf Course Extension,Near Sector 59 , Gurugram-122004 , Haryana-06","lat":28.4129,"lon":77.11735,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"CPU","address":"Pace City-II Urban Estate , 736-E-P, Sector-37-II , Gurgaon - 122018 , India , Gurgaon-122018 , Haryana-06","lat":28.43097,"lon":76.99088,"eta":"2:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"TRILL","address":"Tril Commercial Centre,Tower B , Killa No 12/2 13/1 13/2 14/1,Google Connect Services India Pvt Ltd , Gurgaon-122002","lat":28.4024,"lon":77.03847,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-14)","outlet":"DANA CHOGA (SEC-14)","address":"Shop no 7 & 8, Old Delhi Gurgaon Road, Atul Kataria Chowk Sec-14 , Gurugram-122015 , Haryana-06","lat":28.48255,"lon":77.04957,"eta":"12:00:00 PM"},{"customer":"Dana Choga Foods And Hospitality PVT LTD","outlet":"DC1 (Quatab plaza)","address":"No.F, 6, Qutab Plaza Road, DLF Phase 1, Sector 26A , Gurgaon122002 , Haryana-06","lat":28.47223,"lon":77.10214,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-22)","outlet":"DANA CHOGA (SEC-22)","address":"Gate No 2 Shiva Tower Ground Floor Near TVS Simran Maruti Udyog , Gurugram-122001 , Haryana-06","lat":28.50401,"lon":77.06897,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE Nirvana Country","outlet":"Nirvana","address":"B-119, Nirvana Country, Sector 50, Gurugram , Gurugram122018 , Haryana-06","lat":28.41412,"lon":77.066,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE","outlet":"Sec-83","address":"F 121 1st FLOOR , Sapphire Mall, Sector 83, Gurugram , 122012 -Gurugr , Haryana-06","lat":28.39293,"lon":76.96716,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE (SEC-47)","outlet":"ILd Sector 47","address":"Shop no. 101, ILD Trade Tower, Sector 47, Gurugram , Gurugram-122018 , Haryana-06","lat":28.42513,"lon":77.03894,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-54)","outlet":"DANA CHOGA (SEC-54)","address":"Shop no 2,Ground Floor ,Time Centre, Golf Course Rd, Sector 54, Gurugram","lat":28.43552,"lon":77.10493,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 16 Faridabad","outlet":"Salad Days - Sector 16 Faridabad","address":"SCF No. 40, Ground Floor, Near Post Office, Sector 16-A Market, Part-1, Faridabad, Haryana- 121002","lat":28.41164,"lon":77.31383,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Udyog Vihar","outlet":"Salad Days - Udyog Vihar","address":"250, Udyog Vihar Phase 1, Gurugram, Haryana 122016","lat":28.50935,"lon":77.0835,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sushant Lok","outlet":"Salad Days - Sushant Lok","address":"C-101,102,103 G.F, Sushant Shopping Arcade, Sushant Marg, Sushant Lok-1, Gurugram, Haryana 122009","lat":28.46074,"lon":77.07851,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Golf Course Road","outlet":"Salad Days - Golf Course Road","address":"Unit No. 1, Ground Floor, Times Centre, Sector \u0096 54, Golf Course Road, Gurgaon \u0096 122001","lat":28.43556,"lon":77.10497,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 65 Tee Point","outlet":"Salad Days - Sector 65 Tee Point","address":"Shop No. 25, M3M Tee Point, Block 2, Sector - 65, Gurugram, Haryana 122001","lat":28.39834,"lon":77.06423,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 82 Town Square","outlet":"Salad Days - Sector 82 Town Square","address":"245, First Floor, A1 Block, Vatika Town Square-2, Sector 82, Gurugram, Haryana 122004","lat":28.39027,"lon":76.95928,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 48 Sohna Road","outlet":"Salad Days - Sector 48 Sohna Road","address":"Shop no. 11, First Floor, Omaxe Celebration Mall, Sector 48, Subhash Chowk, Gurgaon, Haryana- 122001","lat":28.4277,"lon":77.03623,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 106 Gurgaon","outlet":"Salad Days - Sector 106 Gurgaon","address":"Shop no. GF-9 & GF-10, Tower B2, Ground Floor, Plaza at 106, Sector 106, Gurgaon, Haryana- 122006","lat":28.50381,"lon":76.99283,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (SECTOR-82)","outlet":"SECTOR-82, GURUGRAM","address":"245 First Floor A1 Block Vatika Town Square-2, Sector 82 Gurugram , Gurugram-122004 , Haryana-06","lat":28.3902,"lon":76.95929,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (Sector 65)","outlet":"SECTOR-66 GURUGRAM","address":"Shop No. 25, M3M Tee Point, Block 2, Sector - 65 , Gurugram122001 , Haryana-06","lat":28.39016,"lon":76.95924,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Gaur City 2","outlet":"Salad Days - Noida Gaur City 2","address":"Shop no. 52 & 53, First floor, Gaur City Centre, Greater Noida West , Greater Noida-201009 , Uttar Pradesh-09","lat":28.60577,"lon":77.42748,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sector 6","outlet":"Salad Days - Noida Sector 6","address":"C-28, FIRST FLOOR, SECTOR 6, NOIDA, GAUTAM BUDDHA NAGAR- 201301","lat":28.59539,"lon":77.31973,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sector 46","outlet":"Salad Days - Noida Sector 46","address":"Shop No. 15 & 16, Upper Ground Floor, Tulip Malls, Sector 46, Noida, Noida, Uttar Pradesh 201303","lat":28.5493,"lon":77.36304,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Indirapuram","outlet":"Salad Days - Indirapuram","address":"CS 5, First Floor, Gyan Khand 2, Above HDFC Bank, Indirapuram GZB, Ghaziabad, Uttar Pradesh 201014","lat":28.64503,"lon":77.35202,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Greater Noida","outlet":"Greater Noida","address":"Shop no. 22, 23; First Floor, GM Mall; Jagat Farm; Greater Noida; Gautam Budh Nagar- 201308","lat":28.48143,"lon":77.50027,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (Noida Sec-73)","outlet":"Salad Days - Noida Sector 73","address":"Shop no. 4 and 5 first floor block A AR Complex 1 Sarfabad, Sec73 , Noida-201303 , Uttar Pradesh-09","lat":28.57995,"lon":77.38537,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sec-141","outlet":"Noida Sec-141","address":"Noida Sec-141, Shop no. 3, Ground Floor, House no. 67, Gali no. 2, Sector 141, Village Shahdara , Noida-201305 , Uttar Pradesh-09","lat":28.50622,"lon":77.4155,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited GTB Nagar","outlet":"Salad Days - GTB Nagar","address":"48, Ground Floor, Mall Road GTB Nagar, Delhi-110009","lat":28.69769,"lon":77.20763,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited","outlet":"Salad Days - Gole Market","address":"Shop No. 130, Bhagat Singh Market, Gole Market, New Delhi, Delhi 110001","lat":28.63327,"lon":77.20723,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Rajouri Garden","outlet":"Salad Days - Rajouri Garden","address":"A-1, Shop 4, Ground Floor, Basai Dara Pur, Opposite Metro Pillar-343, Rajouri Garden, New Delhi , Delhi-110027 , Delhi-07","lat":28.65401,"lon":77.1348,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Vasant kunj","outlet":"Salad Days - Vasant kunj","address":"C-1, KH. No. 405/98, First floor, Left side, Village Masoodpur, Vasant Kunj, New Delhi, Delhi 110070","lat":28.52798,"lon":77.15147,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Malviya nagar","outlet":"Salad Days - Malviya nagar","address":"C-51, Ground Floor, Main Market, Near Laxmi Narayan Temple, C Block, Malviya Nagar, Delhi 110017","lat":28.53789,"lon":77.21251,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Jangpura","outlet":"Salad Days - Jangpura","address":"37/2, Ground Floor, Church Road, Jangpura, Bhogal, New Delhi, Delhi 110014","lat":28.5821,"lon":77.2485,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Laxmi Nagar","outlet":"Salad Days - Laxmi Nagar","address":"1st floor WA-86A, Main Market, Block Wa, Shakarpur, Delhi- 110092","lat":28.628,"lon":77.27911,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Jasola","outlet":"Salad Days - Jasola","address":"GF-7, Ground Floor, Plot No. 7, TDI Centre, Jasola, New Delhi-110025.","lat":28.53769,"lon":77.28766,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (Vikas Puri)","outlet":"Vikas Puri","address":"Shop No. 104\\ First Floor Galaxy Market Block H Block F Vikaspuri , Vikas Puri-110018 , Delhi-07","lat":28.64421,"lon":77.06991,"eta":"12:00:00 PM"},{"customer":"Jubilant Foodworks Ltd (Hongs Kitchen)","outlet":"HONGS KITCHEN","address":"Greater Noida Commissary B-5, Eco Tech -1,Extension -1, Gautam Budh Nagar-201306","lat":28.44051,"lon":77.56205,"eta":"10:00:00 AM"},{"customer":"Jubilant Foodworks Ltd (Gautam Budh Nagar)","outlet":"Gautam Budh Nagar","address":"Plot No. B-5, Sector-Ecotech-1 Extension Greater Noida Industrial Development B-6 Area , Noida-201306 , Uttar Pradesh-09","lat":28.44049,"lon":77.56201,"eta":"10:00:00 AM"},{"customer":"","outlet":"Mohali Commissary ( Jubilant Mohali )","address":"Mohali Commissary B-6 Phase -I, Industrial Area, Sas Nagar , Mohali-160055 , Punjab-03","lat":30.72816,"lon":76.70904,"eta":"10:00:00 AM"},{"customer":"Reliance Retail Limited","outlet":"Milk basket noida","address":"A-154 Sec 63 Noida , Noida-201301 , Uttar Pradesh-09","lat":28.62086,"lon":77.37686,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Sec 22 Chandigarh","address":"SCO 2927 2928,13 Ground floor Sec 22 Chandigarh ,Near Hotel Diamond Hotel , Chandigarh-160022 , Chandigarh-04","lat":30.72991,"lon":76.76707,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"NAC Chandigarh","address":"SCO 866 NAC Chandigarh,Opp MDC Panchkula,Manimazra , , Chandigarh-160101 , Chandigarh-04","lat":30.70791,"lon":76.83786,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Phase 11 Mohali","address":"SCO 12,13 Sabji Mandi,Phase 11 Mohali , Mohali-160062 , Punjab-03","lat":30.67983,"lon":76.74786,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Zirakpur","address":"SOC 17 18, 1st Floor Zirakpur,Near Easy Day Store , Mohali140603 , Punjab-03","lat":30.65081,"lon":76.82198,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Kharar","address":"SCO-57,58, First Floor,City Heart,Chandigarh Road,Kharar-140301,Punjab","lat":30.75065,"lon":76.65291,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Phase 5 Mohali","address":"SCO-2 2nd floor ,Adjust Kalyan jewelers,Phase 5 Mohali,Punjab 160059,Punjab","lat":30.71647,"lon":76.71612,"eta":"12:00:00 PM"},{"customer":"PJTJ TECHNOLOGIS PRIVATE LIMTED(HR)","outlet":"Swiggy Sonipat","address":": Sector 42 Akbarapur Barota Hadbasta No.62 Sonipat Haryana 131103 , Sonipat-131103 , Haryana-06","lat":28.90258,"lon":77.06625,"eta":"5:00:00 PM"},{"customer":"Jasper Associates Pvt Ltd","outlet":"Japser","address":"BUILDING NO 68-69 PRAGATI VIHAR INDUSTRIAL AREA Sector 59 , Faridabad-121004 , Haryana-06","lat":28.30791,"lon":77.30519,"eta":"4:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"55441 Alpha 1 Noida","address":"Subway, Shop No. G-14 , Noida-201309 , Uttar Pradesh-09","lat":28.47314,"lon":77.51467,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"60220 Sec 110","address":"Subway, Unit No 1, Food Court, Lotus Blvd, Sector 100 Noida - 201301","lat":28.5452,"lon":77.36894,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"66466 Sector 18 Noida","address":"Subway, Unit No. C-14, Ground Floor, Sector 18 Gautam Buddha Nagar, Noida City Zone 2 Noida - 201301","lat":28.57145,"lon":77.32484,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"68891 - Indirapuram Ghaziabad","address":"Subway Shop no-147.148,149,Ground Floor Block-c, Indirapuram habitat centre, Ahinsha Khand-1 , Noida-201014 , Uttar Pradesh-09","lat":28.64032,"lon":77.36867,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"70086 Eros Indirapuram","address":"No.3, And Shop 26 Ground Floor, EROS Market Palace , Shakti Khand-2 Indrapuram, Ghaziabad Tahsil , Ghaziabad-201014 , Uttar Pradesh-09","lat":28.64727,"lon":77.37576,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"71996 Grand Venice Mall","address":"Unit no. 4F-01, Fourth Floor, Grand Venice Mall,Plot No SH3, Site IV, near Pari Chowk, Greater Noida , Noida-201308 , Uttar Pradesh-09","lat":28.46541,"lon":77.51095,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72169 Gulshan Mall","address":"Gulshan One 29, M/S Gulshan Homes , Noida-201301 , Uttar Pradesh-09","lat":28.50825,"lon":77.38686,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72170 Sky Mark","address":"SkymarkOne, Tower D (Building), Plot No. H-10/B, Sector 98, Noida, Uttar Pradesh-201301.","lat":28.53225,"lon":77.36166,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72203 Advent","address":"Tower-B Unit\u0096 3A Advant Navis Business Park, Noida Expressway Sector - 142, Noida.","lat":28.50119,"lon":77.40968,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72295 Botanical Garden","address":"Botanical Garden Metro Station BG 3A Ground floor Botanical Metro Station Sector 38 Noida Noida Gaut , Noida-201301 , Uttar Pradesh09","lat":28.56432,"lon":77.33428,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72399 Supertech 34 Noida","address":"Crown Mall Unit No 10 2nd floor Food Court Crown Mall Near BBD Faizabad Road Lucknow Uttar Pradesh 2 , LUCKNOW-226005 , Uttar Pradesh-09","lat":28.58218,"lon":77.36489,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72400 Sharda Hospital, Greater Noida","address":"Unit No. 8, 2nd floor,Food Court, Emerald Mall Plot No 138, Sector D1,Aashiyana, Near Power House Ch , Noida-226012 , Uttar Pradesh-09","lat":28.47392,"lon":77.48221,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72426 Blue Sapphire","address":"Shop 25, Plot No. C-03, Greater Noida W Rd, Sector 4 Greater Noida, Uttar Pradesh 201309","lat":28.6076,"lon":77.43633,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72467 - Vasundhara Ghaziabad","address":"Subway Shop no-8,UGF,KSN Square, Plot NO-12,13 , Ghaziabad201012 , Uttar Pradesh-09","lat":28.66757,"lon":77.38276,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72518 - Gaur gravity","address":"Subway, Gaur Gravity Mall, Indirapuram shop no-5.6,6A,Ground Floor, Vaibhav Khand, Kala Pathar , Noida-201010 , Uttar Pradesh-09","lat":28.63411,"lon":77.36048,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"73036 - Opulent mall Ghaziabad","address":"Subway counter no-01,3rd Floor Food Court, The Opulent Mall,NH91,Gandhi Nagar Ghaziabad , Ghaziabad-201001 , Uttar Pradesh-09","lat":28.65453,"lon":77.43665,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74191 Rcube Monad Noida","address":"Stall no.6, Food court, R Cube Monad, Sector-43, Noida, Uttar Pradesh-201303","lat":28.56085,"lon":77.35675,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74255 Sector 78 Noida","address":"Shop No 5, GH 01, Ground floor, Aditya Urban Casa, Sector 78, Noida, Uttar Pradesh -201301","lat":28.56426,"lon":77.38465,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74265 Cleo County Noida","address":"Shop No.11, Ground floor, Cleo street at Cleo county, Sector 121, Noida, Uttar Pradesh 201307","lat":28.59716,"lon":77.39266,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74296 Golden I Noida","address":"Shop no.2B, Upper Ground Floor, Golden I, Plot No. 11, SectorTech Zone IV, Amrapali Leisure Valley, , Noida-201308 , Uttar Pradesh-09","lat":28.59167,"lon":77.4356,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74313 - La Gracia mall","address":"La Gracia Mall,Crossing Republic Ground Floor,Unit number G07 , Ghaziabad-201016 , Uttar Pradesh-09","lat":28.63211,"lon":77.4346,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74409 - Pratap Vihar","address":"KA -323,Sector-12,Pratap vihar, Shop no- 7 , ghaziabad-201009 , Uttar Pradesh-09","lat":28.64407,"lon":77.40886,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74410 CRC Sublimis Noida","address":"Shop No 15, CRC Sublimis, Sector-1, Noida Extension, Greater Noida, Uttar Pradesh 201306","lat":28.58268,"lon":77.43386,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74516 North india Mall","address":"Food court No.8.,2nd Floor, North India Mall, Vaibhav Khand, Indirapuram, Ghaziabad, Uttar Pradesh 2","lat":28.63433,"lon":77.37031,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74643 Sec 120","address":"Shop No AG- 11, Ground floor, Central Market Sec 120, Sector 120, Noida, Uttar Pradesh 201307","lat":28.58639,"lon":77.39887,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74829 - Mahagun Mart Gaur city2","address":"Shop 3, Plot GH-04, UpPr Grnd Flr, Mahagun My Woods Mart, Sec 16C, Gaur City 2, Greater Noida, U.P , Noida-201009 , Uttar Pradesh09","lat":28.61949,"lon":77.42703,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"75088 - Knowledge Park G. Noida","address":"Shop no.1-A, Ground floor, Knowledge Park II Metro Station, Greater Noida, Uttar Pradesh 201310","lat":28.4574,"lon":77.50032,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"75096 - Noida Bennett University","address":"Ground floor N1 block Bennett University,Greater Noida, Uttar Pradesh, 201310","lat":28.44909,"lon":77.58333,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Vaishali Ghaziabad","address":"Shop no ground floor atulya heights plot no 12 Vaishali secror 3 , Ghaziabad-201010 , Uttar Pradesh-09","lat":28.64521,"lon":77.34137,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"51028 LOGIX CYBER PARK","address":"C 28 & 29,Atrium of Tower C, Logix Cyber Park,Sector 62, Noida 201306 Uttar Pradesh","lat":28.61266,"lon":77.36555,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Gharaunda Delhi-Chandigarh Hwy","address":"Milestone 109 NH-01 Grand Truck Road Village Bastara Gharaunda Karnal , Karnal-132114 , Haryana-06","lat":29.56914,"lon":76.97606,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Karnal Haveli Haryana","address":"Subway at Ground Floor, Karnal Haveli at 133.5 Km Stone, NH-44, Village- Jhanjari, Karnal - 132001","lat":29.75656,"lon":76.96878,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Karnal Sector 7","address":"Subway, SCO No. 94, Sector -7, Karnal - 122001","lat":29.68704,"lon":77.01091,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Subharti University","address":"Unit No. On Main Food Court Next to Keventers,Ground Floor, NH-58, The Mars Hotel, Near Subharti Un , MEERUT-250005 , Uttar Pradesh-09","lat":28.9628,"lon":77.64,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Garh Road Meerut","address":"Subway, Ground floor Plot no.56 Bharat Plaza Garh road,Meerut , meerut-250004 , Uttar Pradesh-09","lat":28.96763,"lon":77.73053,"eta":"8:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Tagore Garden)","outlet":"Pacific Mall Tagore Garden","address":"SH/2F/10, SECOND FLOOR, PACIFIC MALL, NAJAFGARH ROAD, TAGORE GARDEN, West Delhi , DELHI-110018 , Delhi-07","lat":28.64243,"lon":77.10577,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (VK)","outlet":"Ambience Mall Vasant Kunj","address":"RESTAURANT NO. 8 T316A, 3RD FLOOR, AMBIENCE MALL, PHASE-11, BELSON MANDELA ROAD, VASANT KUNJ , South Delhi-110070 , Delhi-07","lat":28.54188,"lon":77.15517,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Janak Cinema)","outlet":"Janak Cinema","address":"Shop No 9 Ground Floor Janak Cinema, Block C 6A, Shop No 9 Ground Floor Janak Cinema, Pankha Road , New Delhi-110058 , Delhi-07","lat":28.61137,"lon":77.09369,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Unity One)","outlet":"Unity Mall Rohini","address":"27B and 27A Ground Floor D Mall Rohini Twin District Centre, D Mall Sector 10 Rohini , New Delhi-110085 , Delhi-07","lat":28.71525,"lon":77.11603,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (D21)","outlet":"Pacific Mall Dwarka","address":"No. FCC/2F/08 FCC/2F/09 , 2nd Floor, Food Court, Pacific Mall, Sector 21 Dwarka Metro Station of Lin , New Delhi-110077 , Delhi-07","lat":28.71523,"lon":77.11614,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED ( Ansa City Centre)","outlet":"Ansa City Centre","address":"SHOP NO. FC-02 FC-03 SECOND FLOOR ANSA CITY CENTRE Raj Nagar extension , Noor Nagar-201001 , Uttar Pradesh-09","lat":28.67478,"lon":77.4402,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (ATS Ghaziabad)","outlet":"ATS Ghaziabad","address":"2nd Floor Plot No. 136 Unit No. 4 ,5 ATS Khyber Range Mall NH24, Pandav Nagar , Ghaziabad-201005 , Uttar Pradesh-09","lat":28.67479,"lon":77.44017,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Kamal Nagar)","outlet":"Kamal Nagar","address":"UA 27A, Malka Ganj Road, Jawahar nagar, North Delhi, Delhi, 110007 , New Delhi-110007 , Delhi-07","lat":28.6802,"lon":77.20832,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Kalka Ji)","outlet":"Kalka Ji","address":"Shop No. E-153,, GROUND FLOOR, KALKAJI, DELHI, South Delhi, Delhi, 110019 , Delhi-110019 , Delhi-07","lat":28.54257,"lon":77.2534,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Papcific Mall Jasola)","outlet":"Papcific Mall Jasola","address":"FCC2-F05, 2nd Floor, Pacific Mall Jasola, New Delhi-110025 , Delhi-110025 , Delhi-07","lat":28.53728,"lon":77.28304,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Epica/Moti Nagar)","outlet":"Epica/Moti Nagar","address":"Unit No. F-007 & F-008, First Floor, Epicah Mall, Plot No.68 and 68/1, Moti Nagar, Najafgrarh Road , New Delhi-110015 , Delhi-07","lat":28.65821,"lon":77.14508,"eta":"6:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Punjabi Bagh Delhi","address":": No 18 NWA, CH Balbir Singh Marg,Club Road,Wesr Punjabi Bagh,New Delhi , New Delhi-110026 , Delhi-07","lat":28.66675,"lon":77.12247,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD EPICAH Moti Nagar","address":"First Floor Pizza Hut Restauran EPICAH Moti Nagar Delhi 7053803677 , New Delhi-110015 , Delhi-07","lat":28.65855,"lon":77.14457,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Lajpat Nagar -DELCO-PHD","address":"K 95 , VEER SAVARKAR MARG, LAJPAT NAGAR 2 , Delhi-110024 , Delhi-07","lat":28.56758,"lon":77.24667,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Nehru Palace-PHD","address":"Shop No-8, 9 Satyam Cinema Nehru Place New Delhi , New Delhi-110019 , Delhi-07","lat":28.55035,"lon":77.2508,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD New Friends Colony","address":"Shop NO- C 9 DDA Market New Friends Colony New Delhi- , New Delhi-110020 , Delhi-07","lat":28.56964,"lon":77.26813,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Jasola Dist. Center","address":"Unit No -15B-16, Splender Forum,3 District Center, Jasola, New Delhi , Delhi-110025 , Delhi-07","lat":28.53767,"lon":77.28678,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Tuglakabad Metro Station","address":"Mohan cooperative industrial estate Tughlakabad metro , New Delhi-110044 , Delhi-07","lat":28.50362,"lon":77.2997,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Pitampura","address":"No 08, Ground floor, PP City Center Pitampura, Rani Bagh, New Delhi , New Delhi-110034 , Delhi-07","lat":28.68986,"lon":77.13493,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FUNCITY","address":": P014 Pizza Hut-Funcity, Prasahant Vihar, Sec-14 Rohini, New Delhi , New Delhi-110085 , Delhi-07","lat":28.71173,"lon":77.13601,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PH M2K Mangalam Delhi","address":"Shop No G-91,GF, Plot no-17,Mangalam Place ,Rohini Sec-3,New Delhi-110085 , Delhi-110085 , Delhi-07","lat":28.70136,"lon":77.11684,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD Sec-11 Rohini","address":": Garg Trade Center , Plot No -6 Rohini Sec -11 New Delhi , New Delhi-110085 , Delhi-07","lat":28.73474,"lon":77.11388,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD Paschim Vihar Delhi","address":"Plot no.1, UGF, Subham enclave,Block A, Paschim Vihar,New Delhi , New Delhi-110063 , Delhi-07","lat":28.66769,"lon":77.09297,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Janakpuri C-1","address":"C1/113 G/Floor Janakpuri Market oopside Mata chandan Devi Hospital , New Delhi-110058 , Delhi-07","lat":28.61948,"lon":77.07932,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Mahavir Enclave","address":"Shop No 4 -5, RZ A1, Dabri - Palam Rd, Mahavir Enclave, New Delhi, Delhi , New Dellhi-110045 , Delhi-07","lat":28.60027,"lon":77.08189,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Ramphal Chowk Sec-7 D","address":"E-561B, Ramphal Chowk Dwarka sec-7, New Delhi , Delhi 110075 , Delhi-07","lat":28.58412,"lon":77.07153,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD City Centre Mall Dwarka","address":"No G22 - 51, PN 5, Hashtag Food Court, near Metro Station, Pocket 8, Block B, Sector 12 Dwarka , New Delhi-110077 , Delhi-07","lat":28.59252,"lon":77.04133,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Vegas Mall Dwarka","address":"Pizza hut Shop no- T-301, Third floor, Plot No-6, Sector 14 (North) Vegas Mall, Dwarka , Delhi-110078 , Delhi-07","lat":28.60141,"lon":77.02894,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Dwarka Mor-PHD","address":"Pizza groung floor, Plot No 6 -7, Main najafgarh road Mohan bhagvati compax,Uttam nagar , Delhi-110059 , Delhi-07","lat":28.62052,"lon":77.03501,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Najafgarh New Delhi","address":"Pizz hut Plot No-25 khasra no 503, OLD Roshan pura extn Block D, Najafgarh Delhi , New Delhi-110020 , Delhi-07","lat":28.60843,"lon":76.9883,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"PHD Adarsh Nagar","address":"B-45 Rajan Babu Road, Adarsh Nagar , New Delhi-110033 , Delhi-07","lat":28.71907,"lon":77.17291,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"PHD Kingsway Camp","address":"GF 2012, Kingsway Camp, GTB Nagar, Outram Lines, Mukherjee Nagar , New Delhi-110009 , Delhi-07","lat":28.69964,"lon":77.20795,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"FCD Nangia Park","address":"Ground Floor, Plot No- 29, Block 6 Shakti Nagar, Civil Lines Center Delhi , New Delhi-110007 , Delhi-07","lat":28.67955,"lon":77.19552,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"FCD Durgapuri Delhi","address":"C-534 chhujjupur 100 Ft road Shahadra Delhi - , Delhi-110032 , Delhi-07","lat":28.68963,"lon":77.28559,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"PHD Cross River Mall Shahdara","address":"G-9 GF cross river Mall, Vishwas Nagar Ext. Shahdara New Delhi , Delhi-110032 , Delhi-07","lat":28.65763,"lon":77.3025,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"PHD Geeta Colony Delhi","address":"A-30 ground floor patparganj road Delhi , Delhi-110052 , Delhi 07","lat":28.65418,"lon":77.27722,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"FCD MAYUR VIHAR","address":"P-37 38 PANDAV NAGAR MAYUR VIHAR , New Delhi-110091 , Delhi-07","lat":28.60838,"lon":77.29254,"eta":"9:00:00 PM"},{"customer":": Devyani International Limited","outlet":"FCD Janpath","address":"Plot No. 27 Block No. 134, 58 Janpath , New Delhi-110001 , Delhi-07","lat":28.62773,"lon":77.21991,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD D Mall","address":"Rohini Shop No. G-9 and G-10, Sec-10 D Mall Rohini New Delhi, New Delhi, , New Delhi-110085 , Delhi-07","lat":28.71894,"lon":77.11497,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Satyaniketan 2","address":"SHOP NO 123, 124 Satya niketan road. OPP SRI VENKATESHWAR CLG ,MOTT BAGH 2 , Delhi-110021 , Delhi-07","lat":28.58828,"lon":77.16837,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD - DLF South Square Mall","address":"Pizza Hut, 39 DLF South Square Mall, Sarojini Nagar Market , New Delhi , Delhi-110023 , Delhi-07","lat":28.57657,"lon":77.19498,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Pizza Hut - Saket","address":"29 Community Centre,PVR Anupam,Sakt New Delhi-110017 , Delhi-110017 , Delhi-07","lat":28.52324,"lon":77.20793,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PH FCD DEl Devli Rd","address":"4 FCD D-139,GF, Krishna Park, Devli Road, New Delhi, South East Delhi , New Delhi-110062 , Delhi-07","lat":28.50741,"lon":77.23221,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD CR PARK RD, DELHI","address":"D CR PARK L-15, Kalkaji,, CR Park Main Road,, New Delhi, New Delhi , New Delhi-110019 , Delhi-07","lat":28.53735,"lon":77.25746,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Vasant Square Mall","address":"Shop No.15 Groud Flr Vasant Square Mall ,Vasant Kunj New delhi , Delhi-110070 , Delhi-07","lat":28.52486,"lon":77.15654,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PH Pacific Mall Sec 21 Dwarka","address":": Pizza Hut Restaurant, Pacific D21 Mall, Dwarka Sector -21, Metro Station, New Delhi-110077 , Delhi-110077 , Delhi-07","lat":28.5526,"lon":77.05793,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PH Sec-106 Dwarka Exp. GGN","address":"Khewat No- 442 Opp. Conscient One Sector- 106 Village- Pawala , GURUGRAM-122001 , Haryana-06","lat":28.50722,"lon":77.00578,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut - Sector- IV, GGN","address":"P099PHD - Sector- IV Gurgaon, SCF No. 37,, HUDA Market Sector 4 Gurgaon , Gurugram-122001 , Haryana-06","lat":28.47344,"lon":77.00921,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut - Sec-10, GGN","address":"Ground and First Floor SCO NO3, Sector 10 A, HUDA Market , Urban Estate , Gurugram-122001 , Haryana-06","lat":28.43983,"lon":77.00681,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut - Sec-14, GGN","address":"P021PHD - Sec-14, SCO - 24,, Sector - 14, Gurugram, Haryana , Gurugram-122002 , Haryana-06","lat":28.47591,"lon":77.04467,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PH Sushant Lok, DT City Centre","address":"GF FF DT Shop B. No 001, 101, DT City Centre Mall, Mehrauli Rd, DLF Phase 1, , Gurugram-122002 , Haryana-06","lat":28.47949,"lon":77.08066,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PH FCD GGN Suppermart Lok","address":"Shop. No. B-139 and B141, Supermart-1 Sushant Lok Gurugram , Gurugram-122003 , Haryana-06","lat":28.46266,"lon":77.08758,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PH FCD GGN MGF Metro Mall","address":": 3rd Floor left side, MGF Metropolitan Mall, Sector-25, Mehrauli Gurgaon , Gurugram-122002 , Haryana-06","lat":28.48113,"lon":77.08031,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Sadar Bazar GGN","address":": GF, P.No.34, Jail Land, SCO-34,Sector- 11,Sadar Bazar, Huda Complex Sohna Chowk , Gurugram-122001 , Haryana-06","lat":28.45912,"lon":77.0268,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Ocus Middley Dwarka","address":"Pizza Hut Ocus Medley Ground Floor Dwarka Expressway G-99 Sector 99 Gurugram Haryana (122001) , GURGAON-122001 , Haryana-06","lat":28.467,"lon":76.96944,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Elan Mercado","address":"Elan Marcado Mall, Naurangpur, Main NH 8, Sec-80, Tehsil Manesar Gurgaon , Gurugram-122050 , Haryana-06","lat":28.37678,"lon":76.95973,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Huda Market Sec31 GGN","address":"First Floor, Huda Market, SCO No.-6, Sector-31 Gurugram , Gurugram-122003 , Haryana-06","lat":28.45328,"lon":77.05093,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD GGN Unitech Cyber Park Sec 39","address":"P049Pizza Hut - Cyber Park GF, Tower - C Sector-39 Unitech World , Gurugram-122002 , Haryana-06","lat":28.4436,"lon":77.05594,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut Baani Square Gurgaon","address":": F-58, 1st Floor, Baani Square, SECTOR 50, Gurgaon , Gurugram 122018 , Haryana-06","lat":28.4259,"lon":77.05766,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Manesar Highway","address":": PH at GF, Plot No-SCO-D-12, Sector-1, IMT-Manesar , Gurugram-123106 , Haryana-06","lat":28.36673,"lon":76.94608,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD IRIS Broadway","address":"PH, Shop No G 145, 146, 147, GF, IRIS Broadway, Sector 85, Gurgaon , Gurugram-122004 , Haryana-06","lat":28.40408,"lon":76.94775,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD New Town Square Gurgaon","address":"Shop SH/G/039, GF, Sec 95A,Main Pataudi Road Vill.Hayatpur, Farrukhnagar, , Gurugram-122505 , Haryana-06","lat":28.42439,"lon":76.93096,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"FCD M3M Broadway Gurgaon","address":"GF, Golf Course Ext Rd, Sector 71, Gurugram , Gurugram 122018 , Haryana-06","lat":28.40154,"lon":77.01996,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD M3M Urbana Sec-67","address":"-PHD M3M Urbana,03,04,04 A, Block-3,, Ground Floor, M3M Urbana, Sec-67 Gurugram , Gurugram-122102 , Haryana-06","lat":28.39091,"lon":77.06724,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Sec-58 Gurgaon","address":"Pizza hut at shop No- 04,05,06,07 Ground floor The grand arch Sec 58 , Gurgaon-122102 , Haryana-06","lat":28.41336,"lon":77.11366,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD ILD Trade Centre Sohana","address":"Badshahpur Sohna Rd Hwy, D1 Block, Malibu Town, Sector 47, Gurugram , Gurugram-122018 , Haryana-06","lat":28.4235,"lon":77.0395,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut Ambi Mall","address":"Ambi Mall, R - 2,Third Floor,, Ambi Mall Ambience Island NH - 8, Gurugram , Gurugram-122004 , Haryana-06","lat":28.50407,"lon":77.09697,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD - Narela Delhi","address":"Shop No-43, arya samaj road Narela delhi -110040 City-New delhi , Delhi-110040 , Delhi-07","lat":28.85701,"lon":77.0915,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Naraina Vihar Delhi","address":"Shop No 1 to 4, Plot No 6, Industrial Area Phase I, Block BNaraina Vihar , New Delhi-110028 , Delhi-07","lat":28.63319,"lon":77.13838,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Subhash Nagar-Delhi","address":"P072 PHD Subhash Nagar, Pacific Mall, Community Centre, Najafgarh Road , New Delhi-110018 , Delhi-07","lat":28.64184,"lon":77.10502,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Jail Road , Delhi","address":"P200 PHD - Jail Road 16/4, Prem Nagar, New Delhi , New Delhi 110086 , Delhi-07","lat":28.63616,"lon":77.09623,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Vikas Puri Delhi","address":"P106 PHD - Vikas Puri G-8, B-1, B2, B-3,, PVR, Sonia Theatre Vikas Puri, , New Delhi-110018 , Delhi-07","lat":28.63908,"lon":77.07442,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD Uttam Nagar Delhi","address":"P606 GF D-26, D27 , WZ-153, K.no. 83/24,25, Village Hastal, Colony Block-D, Main Nazafgarh Rd , DELHI-110059 , Delhi-07","lat":28.62802,"lon":77.058,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD AeroCity","address":": P321 PHD-Aerocity, Asset No.11,, Ground Floor, Worldmark-1 Aerocity , New Delhi-110037 , Delhi-07","lat":28.55084,"lon":77.12211,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Vasant Square Mall","address":"Shop No.15 Groud Flr Vasant Square Mall ,Vasant Kunj New delhi , Delhi-110070 , Delhi-07","lat":28.52486,"lon":77.15654,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PH Pacific Mall Sec 21 Dwarka","address":"Pizza Hut Restaurant, Pacific D21 Mall, Dwarka Sector -21, Metro Station, New Delhi-110077 , Delhi-110077 , Delhi-07","lat":28.5526,"lon":77.05793,"eta":"9:00:00 PM"},{"customer":": Sapphire Foods India Limited (HR)","outlet":"HR Ansal Plaza- PH Sector 23","address":"Shop No.- GFA 01A , UGFA-1A, Palam Vihar, Gurgaon, Ansal Plaza , Gurgaon-122017 , Haryana-06","lat":28.51188,"lon":77.04192,"eta":"9:00:00 PM"},{"customer":": Sapphire Foods India Limited (HR)","outlet":"HR Sector 23A PH Sector 23A","address":"Ground Floor, Huda Market, Sector - 23A,, Sector 23A, SCO-63, , Gurugram-122015 , Haryana-06","lat":28.50493,"lon":77.05453,"eta":"9:00:00 PM"},{"customer":": Sapphire Foods India Limited (HR)","outlet":"HR Cyber Green- PH","address":"PHD, Cyber City, DLF-III, Gurgaon, Haryana Cyber Green, Shop No.- A2, Ground Floor, Cyber Green , Gurgaon-122001 , Haryana-06","lat":28.49466,"lon":77.09303,"eta":"9:00:00 PM"},{"customer":": Sapphire Foods India Limited (HR)","outlet":"Pizza Hut Sector - 57","address":"Lower Ground, Sushant Lok 2, Sector- 57, Gurgaon,, Hongkong Bazaa , Gurugram-122002 , Haryana-0","lat":28.42131,"lon":77.09065,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Sarojini Nagar HS","address":"KFC-HS, 24-29 DLF South Square Mall, Sarojini Nagar , New Delhi-110023 , Delhi-07","lat":28.57656,"lon":77.19511,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Devli - KFC","address":"InLine, D213 Deoli Raod , Khanpur, New Delhi , New Delhi 110062 , Delhi-07","lat":28.50704,"lon":77.23211,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Palam Vihar, GGN","address":"S n.25 to 27,36 to 39, Global Foyer,B- Pocket H, Sector 1, Palam Vihar,Vill-Chauma, , Gurugram-122017 , Haryana-06","lat":28.51626,"lon":77.0409,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Conscient One S109, GGN","address":"K512 KFC GF, Conscient Mall One, Unit No CG 129/132/133/138/141, Sec 109, Gurugram , Gurugram-122017 , Haryana","lat":28.50321,"lon":77.00703,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Sector 10, GGN","address":"KFC K487 Ground and First Floor SCO NO7, Sector 10 A, HUDA Market , Gurugram-122001 , Haryana-06","lat":28.43948,"lon":77.00598,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Huda Metro Station, GGN","address":"K549 KFC North Court, Huda City Centre Metro Station,Sec-29, Gurugram , Gurugram-122002 , Haryana-06","lat":28.45953,"lon":77.07275,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Sector 20, GGN","address":"K283 KFC Sector 20 Cyber Park, DLF Cyber PARK 2, Udyog Vihar Sector 20, Gurgaon , Gurugram-122008 , Haryana-06","lat":30.67201,"lon":76.85508,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC DL Down Town GGN","address":"KFC, DLF Down Town, Commercial Site Block 5, DLF City Phase 3 Rd, Sector 25 A , Gurugram-122002 , Haryana-06","lat":28.63543,"lon":77.09075,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC M3M Experia 113 GGN","address":"SCO 42, GF, Sector 113 , Gurugram-122017 , Haryana-06","lat":30.67202,"lon":76.85507,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Medicity, GGN","address":"KFC - Medicity Gurgaon , Gurugram-122001 , Haryana-06","lat":28.44389,"lon":77.0395,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC - DT City Center Mall","address":"DT City Center Mall, Shop No 28 and 124 Ground and First Floor, DT City Center , Gurugram-122002 , Haryana-06","lat":28.47917,"lon":77.08051,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Sushant Lok, Supermart 1 GGN","address":"Shop N. B139 B141, Supermart-1,Sushant Lok, Gurgaon, Gurugram , Gurugram-122003 , Haryana-06","lat":28.46266,"lon":77.08784,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Aardee Mall, GGN","address":": Shop no. SR-05, UGF, Ardee Mall, Block B, Ardee City Rd, Sector 52 Gurugram , Gurugram-122002 , Haryana-06","lat":28.446,"lon":77.08095,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Vatika Business Park","address":"Shop No- 001 002 GF Tower- A Vatika Business park Sector- 49 Gurugram Haryana-1221 , GURUGRAM-122101 , Haryana-06","lat":28.40663,"lon":77.04471,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ARJANGARH METRO HS DL","address":"KFC ARJANGARH Metro - Outlet No 1 Ground Floor Arjun Garh Metro Station , Delhi-110010 , Delhi-07","lat":28.48145,"lon":77.12576,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Ocus Medley Sec99","address":"G-27/28/29/30/31/34/35,GF, Ocus Medley Mall,Township G99 , Gurugram-122001 , Haryana-06","lat":28.46722,"lon":76.9693,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Elan Mercado Sec80","address":": Elan Marcado Sec-80 Naurangpur, Tehsil Manesar, Delhi-Jaipur Expway Gurgaon , Gurugram-122051 , Haryana-06","lat":28.37759,"lon":76.95902,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Sctor 46 Huda Market","address":"GF and FF SCO-115 ,Huda Market, Scetor -46, Urban Estate Gurgaon II , Gurugram-122003 , Haryana-06","lat":28.43436,"lon":77.05918,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Metro Mall Sec 55&56","address":"Shop No 32, 33, 60, 61, 62, Huda Market Road, Sector 56, Gurgaon , Gurugram-122011 , Haryana-06","lat":28.42027,"lon":77.08997,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN DLF Cyber Hub 2","address":"DLF Cyber Hub Gurgaon , DLF , Cyber HUB, Klay Unit -UGF-C 2B, Haryana , Gurugram-122002 , Haryana-06","lat":28.49389,"lon":77.08872,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Entertainland Mall Sec 83","address":"K.F.C. at Shop No- 26A & 26B, Entertainland Mall, NH- 48, Sector- 83, , Gurugram,-122004 , Haryana-06","lat":28.39323,"lon":76.9761,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Manesar DEL&JAI Hwy","address":": Ground Floor , J Plaza 55th Mile stone NH-8 VILL KUKRALA PACHGAON , Gurugram-122001 , Haryana-06","lat":28.32922,"lon":76.90103,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN IRIS Broadway Sec85","address":"KFC, K179, Shop No 140, 141, 131, IRIS Broadway, Sector 85, Gurgaon , Gurugram-122004 , Haryana-06","lat":28.40412,"lon":76.94769,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN New town Square 95A","address":"KFC New Town Square Gurgaon, GF, Sec 95A Main Pataudi Road, Village Hayatpur , Gurugram-122505 , Haryana-06","lat":28.42465,"lon":76.93054,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN M3M Broadway","address":"GF R1G01 and R1G02 M3M Broadway, Village Fazilpur Jharsa Teh Badhshapur , Gurugram-122018 , Haryana-06","lat":28.40188,"lon":77.01903,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN M3M Urbana Sec-67","address":"Shop No.G-11,12,14-15, Golf Course Extension Road,Sector 67,Gurugram , Gurugram-122002 , Haryana-06","lat":28.39106,"lon":77.06712,"eta":"9:00:00 PM"},{"customer":": DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN OCUS Quantam Sec51","address":": KFC U. No. G-8/9/10,GF Ocus Quantum Mall, Revenue Estate of samaspur,Sec 51 , Gurugram-122003 , Haryana-06","lat":28.42522,"lon":77.0681,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN ILDTrade Cntr Sohna Rd","address":"ILD Sohna Road, ILD Trade Centre, Sector 47 Shop No.25,26,27,28, Sohna Road , Gurugram-122001 , Haryana-06","lat":28.42518,"lon":77.03938,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Ambi Mall R2 3F","address":"Ambi Mall-I, R-2, 3Rd Floor, Ambience Mall,, Gurgaon , Gurugram-122010 , Haryana-06","lat":28.50402,"lon":77.09692,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"KFC-FORECOURT-T3ARVL","address":": KFC,T-3 Airport, Forecourt at T-3, Arrival Ground Floor IGI Airport, , New Delhi-110037 , Delhi-07","lat":28.55669,"lon":77.08443,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC Kapashera Delhi","address":"Shop No 1, Gr Floor, Khasra No 1293/1, Old Delhi Gurugram Rd, Kapas Hera, New Delhi, Delhi 110097","lat":28.52156,"lon":77.08229,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC Dhaula Kuan Metro Station","address":"OUTLET NO 3,GROUND FLOOR ,POD FOOD COURT,DHAULA KUAN METRO STATION ,NEW DELHI 110010 , Delhi-110010 , Delhi-07","lat":28.59223,"lon":77.16211,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Vasant Kunj MS","address":"SHOP 12,VASANT SQUARE MALL, ABDUL GAFFAR KHAN MARG, POCKET 7, SECTOR B, VASANT KUNJ , New Delhi-110070 , Delhi-07","lat":28.5251,"lon":77.1566,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Ambience MFC","address":"SHOP NO R2, 3RD FLOOR, NELSON MANDELA MARG, AMBIENCE MALL, , Delhi-110070 , Delhi-07","lat":28.50621,"lon":77.09632,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC BASANT LOK","address":"InLine, G05 , GROUND FLOOR, PVR PRIYA,61, BASANT LOK,VASANT VIHAR NEW DELHI , New Delhi-110057 , Delhi-07","lat":28.55778,"lon":77.16426,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Malviya Nagar HS","address":"KFC-HS, Shop No. C-5, Ground Floor, Main Market, Malviya Nagar, New Delhi , New Delhi-110017 , Delhi-07","lat":28.53712,"lon":77.21184,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Ansal Plaza MS","address":": KFC-HS, BG-06, ansal plaza khel gaon, andrews ganj, New Delhi 110049 , New Delhi-110049 , Delhi-07","lat":28.56292,"lon":77.2247,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Kalkaji HS","address":"F-4, KALKAJI MAIN ROAD, KALKAJI, NEW DELHI, , New Delhi 110019 , Delhi-07","lat":28.54235,"lon":77.2536,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Saket HS","address":"Community Center, Ashok Vihar, Saket, , New Delhi-110017 , Delhi-07","lat":28.52427,"lon":77.20778,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Saket Select City Walk MS","address":"DEL Saket Select City A-3 District Centre, Saket, New Delhi, , New Delhi-110017 , Delhi-07","lat":28.52857,"lon":77.21899,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Nehru Place MFC","address":"FOOD COURT, LOWER GROUND FLOOR, TDI MALL, NEHRU PLACE, NEAR NEHRU PLACE METRO STATION , New Delhi-110015 , Delhi07","lat":28.55165,"lon":77.25164,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC Paras Cinema","address":"Inline, Space On Ground Floor Plot No1 Paras Cinema Building, Nehru Place , New Delhi-110019 , Delhi-07","lat":28.54722,"lon":77.25193,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL NFC","address":"InLine, SHOP No 7,8,9,10 Grandley Cinema Complex, New Friends Colony , New Delhi , New Delhi-110025 , Delhi-07","lat":28.56181,"lon":77.26888,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Lajpat Nagar - KFC - 5312","address":"J 23 A, CENTRAL MARKET, LAJPAT NAGAR II, , New Delhi 110024 , Delhi-07","lat":28.56946,"lon":77.24277,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC-Lajpat Nagar 2 HS Delhi","address":"Inline, Shop no -2 Near gate no 4 Lajpat Nagar Metro Station New Delhi , New Delhi-110024 , Delhi-07","lat":28.56953,"lon":77.23855,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Hauzkhas","address":"InLine, Bare Space at Concourse level at Hauz Khas Metro Station Line no 8 , New Delhi-110016","lat":28.54411,"lon":77.20621,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Devli - KFC","address":"InLine, D213 Deoli Raod , Khanpur, New Delhi , New Delhi110062","lat":28.50704,"lon":77.23211,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Sarojini Nagar HS","address":"Ground Floor, DLF SOUTH SQUARE, Shop No DSS 24 to 29, opposite Sarojini Nagar Market, New Delhi, Delhi 110023","lat":28.57656,"lon":77.19511,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Subhash Nagar 1 MFC","address":": KFC Restaurant ,Shop No L7, 2ND Floor , Pacific Mall, Tagore Garden, New Delhi-110018 , Delhi-110018 , Delhi-07","lat":28.6429,"lon":77.10643,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Uttam Nagar HS","address":": KFC-Hs, 167 B Ground Floor Opp Metro Pillar, No 672, Main Road Uttam Nagar , New Delhi-110059 , Delhi-07","lat":28.62277,"lon":77.05935,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Janakpuri-1 HS","address":": Shop No 8 To 11, Inside Satyam District Center Janakpuri , New Delhi-110058 , Delhi-07","lat":28.63052,"lon":77.08197,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Janakpuri-2 HS","address":"KFC Restaurant, C-1/133, Lal Sai Marg, Janakpuri New Delhi 110058 , Delhi-110058 , Delhi-07","lat":28.62141,"lon":77.08158,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Janakpuri-3 MS","address":"G01, Ground Floor And 101 First Floor, Unity One Mall, Janak Puri , New Delhi-110058 , Delhi-07","lat":28.62913,"lon":77.07557,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL JANAK CINEMA","address":"Inline, The Janak, Janak Cinema Complex, ,Pankha Road Janak Puri , New Delhi-110058 , Delhi-07","lat":28.61144,"lon":77.09371,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Mahavir Enclave HS","address":"KFC-Hs, A-Block, Plot No:4-5, Kh.No:82/18,Main Road Mahavir Enclave , New Delhi-110045 , Delhi-07","lat":28.60048,"lon":77.08167,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Dwarka More","address":"Inline, B-2 Rama Park , Near Dwarka More Metro Station , , New Delhi-110059 , Delhi-07","lat":28.62669,"lon":77.03654,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"Dwarka 9","address":": Inline, Part Of Ground Floor On Plot No 228 Sector 9,Dwarka , New Delhi-110075 , Delhi-07","lat":28.57492,"lon":77.0676,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Dwarka Sec-12 MFC","address":": KFC, Unit No 26, 27, Food Court, City Centre, Plot No 5., Sector 12, Dwarka, , Delhi-110075 , Delhi-07","lat":28.59231,"lon":77.04147,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Dwarka Sec-14 NOP MS","address":"Vegas Mall, Plot No:06, Sector 1(North) Dwarka , New Delhi 110078 , Delhi-07","lat":28.60109,"lon":77.02979,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Dwarka Sec-21 MFC","address":"KFC-Hs, Pacific Mall,Second Floor, Food Court, Sec-21, Dwarka Metro Station, Airport Express Line , New Delhi-110077 , Delhi-07","lat":28.55295,"lon":77.05911,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC \u0096 Cargo airport \u0096Delhi","address":"KFC Restrudent, G5 Public Amenities Complex, Gate No 5,Internation Cargo Airport,Vasant Vihar, DELH , Delhi-110037 , Delhi-07","lat":28.55632,"lon":77.10162,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC TILAK NAGAR HS DL - 5384","address":": Inline NEAR TILAK NAGAR METRO STATION 29/2 GROUND AND FIRST FLOOR DOUBLE STOREY , DELHI-110018 , Delhi-07","lat":28.63694,"lon":77.09698,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ARJANGARH METRO HS DL","address":": KFC ARJANGARH Metro - Outlet No 1 Ground Floor Arjun Garh Metro Station , Delhi-110010 , Delhi-07","lat":28.48145,"lon":77.12576,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Prashant Vihar DT","address":"KFC, Shop No G-12 to 14, Funcity Mall, Vijay Vihar, Prashant Vihar, Sector 14, New Delhi , Delhi-110085 , Delhi-07","lat":28.71829,"lon":77.09504,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL SHALIMAR BAGH - KFC - 5357","address":": KFC Restaurant Units No -24,25 GF Plot No-2 B-Block Community Centre, West Shalimar Bagh 110088 , Delhi-110088 , Delhi-07","lat":28.71311,"lon":77.1583,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Unity Elegante NSP-KFC","address":": FC, Subash Place,MRTS Station Opposite Wazirpur District Center,Shop No.T-001 Third Floor, Unity One , New Delhi-110034 , Delhi","lat":28.69788,"lon":77.14807,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Pacific Mall - KFC - 5329","address":"KFC Restaurant,Pacific Mall NSP, FCC LGF/10, Concourse Level,NSP Metro Station- New Delhi- 110034 , Delhi-110034 , Delhi-07","lat":28.69048,"lon":77.15044,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Pitampura MFC","address":"KFC, Plot No 3, PP City Center, SN 19,20, Gr Flr, Rd No 44, Rani Bagh, Pitampura, New Delhi , Delhi-110034 , Delhi-07","lat":28.68954,"lon":77.13444,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ROHINI-11","address":": KFC Restaurant,Plot No:-6, Garg Trade Centre, Sector-11, Rohini North West, New Dehli-110085 , Delhi-110085 , Delhi-07","lat":28.73613,"lon":77.11386,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Rohini -2 - KFC - 5317","address":": KFC Restaurant,Unity No-17 On Ground Floor, Unity One Rohini At Rohini West Metro Station Complex, N , Delhi-110085 , Delhi-07","lat":28.71639,"lon":77.11643,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL M2K Rohini MS","address":"KFC Restaurant, 16 Mangalam Place District Centre, Sector-3, Rohini, New Delhi-110085 , Delhi-110085 , Delhi-07","lat":28.70182,"lon":77.11673,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Paschim Vihar","address":"KFC Restaurant, G- 5, Pushkar Enclave, Paschim Vihar,Punjabi Bagh West, Delhi -110063 , Delhi-110063 , Delhi-07","lat":28.66419,"lon":77.09229,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Najafgarh HS","address":"KFC Restaurant, Najafgarh, Plot No C9, Ground Floor, Old Roshanpura, Najafgarh, New Delhi- 110039 , Delhi-110039 , Delhi-07","lat":28.60631,"lon":76.98629,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ROHTAK HIGHWAY DT HR","address":"KFC Drive Thru, Rohtak Highway, VILLAGE ISMAILA , ROHTAK, Haryana , Delhi-124001 , Delhi-07","lat":28.78549,"lon":76.75452,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Model Town - KFC","address":"Plot No B-4 , 1st Floor Gujranwala Town ,Near Model town metro Station,New Delhi Pin-110009. , Delhi-110009 , Delhi-07","lat":28.70495,"lon":77.19003,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL NAGIAPARK - KFC","address":": KFC Restrudent Nagia Park, 11596,Block-28,Plot no-6,Shakti Nagar,New Delhi-110007 , Delhi-110007 , Delhi-07","lat":28.67985,"lon":77.19393,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC GTB Nagar","address":": GROUND FLOOR,GTB NAGAR, SHOP NO 85 and 87 DL GTB NAGAR HS KFC , Delhi-110009 , Delhi-07","lat":28.69856,"lon":77.20582,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DILSHAD GARDEN","address":"Shop number 6, Grand trunk road Jhilmil industrial area, Dilshad garden, New Delhi 110095. , Delhi-110095 , Delhi-07","lat":28.67614,"lon":77.32089,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"CBD Shahdara","address":"Shop Number 12, Front side, Unity one mall, CBD Shahdara, Delhi -110092 , Delhi-110092 , Delhi-07","lat":28.66092,"lon":77.29776,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Preet Vihar HS","address":"High Street, F-25, GROUND FLOOR, VIKAS MARG, , DELHI 110092 , Delhi-07","lat":28.643,"lon":77.29623,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Vikas Marg HS","address":": KFC Nirman Vihar, E - 363, Ground Floor, Nirman Vihar, Near Nirman Vihar Metro Station New Delhi - 1 , Delhi-110092 , Delhi-07","lat":28.63687,"lon":77.28744,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL V3S Mall","address":": KFC V3S Mall,Shop/ Food court no. 10, 3rd flr, V3S east centre, situated at plot no.12, LaxmiNagar, , Delhi-110092 , Delhi-07","lat":28.63731,"lon":77.28662,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Krishna Nagar HS","address":"Upper Ground Floor, A-12, Main Road, Swami Dayanand Marg, East Krishna Nagar, Delhi - 110051 , Delhi-110051 , Delhi-07","lat":28.6595,"lon":77.2887,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Akshardham","address":": Shop no \u0096 G-27, Akshardham metro station, Delhi \u0096 110092 , Delhi-110092 , Delhi-07","lat":28.61819,"lon":77.27948,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"Mayur Vihar","address":"SHOP NO 17,18,25A,26 GR FLR, TOWER A, THE ADDRESS, MAYUR VIHAR PHASE 1 EXTENSION , Delhi-110091 , Delhi-07","lat":28.59451,"lon":77.29851,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL New Ashok Nagar HS","address":"Shop No G-03, New Ashok Nagar Metro Station, New Delhi 110096 , Delhi-110096 , Delhi-07","lat":28.58926,"lon":77.3016,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC JASOLA","address":"Unit No. FCC2F17, 2nd Flr, Pacific Mall, Jasola Apollo Metro Station, CPD -48, Sarita Vihar, Mt Road , Delhi-110044 , Delhi-07","lat":28.53752,"lon":77.28292,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Kamla Nagar - KFC","address":"PLOT NO - 38UA , BUNGLOW ROAD , KAMLA NAGAR ,NEW DELHI 110007 , Delhi-110007 , Delhi-07","lat":28.68062,"lon":77.208,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Chand Cinema","address":"FC, GROUND FLOOR CHAND CINEMA TRILOKPURI,CHAND CINEMA BUILDING,SHOP NO.2, DELHI , DELHI-110091 , Delhi-07","lat":28.61273,"lon":77.31064,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC-DL Punjabi Bagh Central Market","address":"INLINE GROUND FLOOR NO 19 And 20 CENTRAL MARKET , PUNJABI BAGH-110026 , Delhi-07","lat":28.61273,"lon":77.31062,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Epicuria Eros MFC","address":"Shop No./Unit-FC2,Epicuria Eros Mall,, District Center 10,Shivaj Rajouri Garden , New Delhi-110027","lat":28.65121,"lon":77.12134,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"Rajouri Garden","address":"Upper Ground Floor -E14, Rajouri Garden, New Delhi 110027 , New Delhi-110027","lat":28.64343,"lon":77.12252,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC Kirti Nagar -2 HS","address":"M44X+JPQ, Patel Rd, Block 1, Block B, Najafgarh Road Industrial Area, New Delhi, Delhi, 110015","lat":28.65679,"lon":77.14924,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Patel Nagar HS","address":"No W2/14, Upper Ground Floor, West Patel Nagar, New Delhi, Delhi 110008","lat":28.6458,"lon":77.16892,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"Pusa Road Karol Bagh","address":"B1/8,Main Pusa Road, Apsara arcade, New Delhi -110005 , Delhi-110005 , Delhi-07","lat":28.64411,"lon":77.1888,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL CP-1 HS","address":"No A12, Inner Cir, Connaught Place, New Delhi, Delhi 110001","lat":28.63292,"lon":77.21825,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL CP-2 HS+M11","address":"SHOP NO-6&7, KFC RESTAURANT, SCINDIA HOUSE, OUTER CIRCLE,CONNAUGHT PLACE- 110001","lat":28.62992,"lon":77.22011,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Paharganj HS","address":": PlotNo.1 on Upper Ground Floor,Situated at plot No.1,Block-8, D B , New Delhi-110055 , Delhi-07","lat":28.64578,"lon":77.2098,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL NDRS MFC","address":"Pop and Hope Food Plaza, Kiosk no 1 , New Delhi Railway station , Ajmeri Gate , Near metro station , Delhi-110002 , Delhi-07","lat":28.64282,"lon":77.22186,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"Omaxe Chandni Chowk","address":"HC SEN MARG,GANDHI MAIDAN,CHANDANI CHOWK, OMAXE UNIT NO FC36 , New Delhi-110006 , Delhi-07","lat":28.65844,"lon":77.23073,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Kashmiri Gate MS","address":"Gate No 1, Shop No 10 & 11, Ground Floor, next to Metro Station, Kashmere Gate, New Delhi, Delhi 110006","lat":28.66813,"lon":77.22857,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"HR Sonipat Castle Gd Plaza-KFC","address":"Drive Thru, KFC Restaurant AMR Kassel Grand Plaza, Kundli, , KUNDLI-131028 , Haryana-06","lat":28.86857,"lon":77.12372,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"HR Sonipat City Mall-KFC","address":"Shop No.6,7,8,on Ground Floor,City Mall,, Situated at Baba Tarana Next to Bus Stand,Sonipat,Haryana , Sonipat-131001 , Haryana-06","lat":29.00289,"lon":77.02707,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"(KFC- Epicah Delhi)","address":"Shop/Unit No. F-004, 1st Floor located at Epicah Avenue, Epicah Mall, 68 & 68/1, Najafgarh Road, Mot , Delhi-110015 , Delhi-07","lat":28.65826,"lon":77.14513,"eta":"9:00:00 PM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"PAC- MALL","address":"Opp. Metro Pillar No.464 Shivaji Marg, Subhash Nagar Pecific Mall New Delhi- 110027","lat":28.6996,"lon":77.1551,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"T.N","address":"4B/16, Shivaji Marg (Najafgarh Road), Block 4B, Tilak Nagar, New Delhi, Delhi 110018, India","lat":28.63928,"lon":77.10104,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-12","address":"G/5, G/6 & G/7, City Centre, Plot No. 5, Sector 12, Dwarka, New Delhi, Delhi 110078","lat":28.59307,"lon":77.04101,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"JNC","address":"Counter No. 2, Janak Cinema Complex, Plot No. C6A, Community Centre,-Pankha Road-Janakapuri New Delhi 110058","lat":28.61145,"lon":77.09298,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-14","address":"Vegas mall,Shop No. T-304,305 Third Floor Plot no 6, sector 14(North), Dwarka, New Delhi 110078","lat":28.60141,"lon":77.03004,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-21","address":"2nd Floor, Pacific Mall, Sector-21, Food Court, Second Floor, Dwarka, New Delhi 110077","lat":28.553,"lon":77.05908,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-11","address":"Shop No. G/1\u00968, Plot No. 4, GF, Aakash Tower, Near Ashirwad Chowk, Sector-11, Dwarka, New Delhi, Delhi 110075","lat":28.5962,"lon":77.05004,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Moti Nagar","address":"17A, Shivaji Marg- Najafgarh Raoad-Motinagar, Karampura Industrial Area, New Delhi 110026","lat":28.6617,"lon":77.1499,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Pusa Road","address":"B-1/1, Pusa Road, Karol Bagh, 11, Ground Floor, New Delhi, Delhi 110005","lat":28.64527,"lon":77.19287,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Karol Bagh","address":"Ground Floor, Shop No. G-03, 04, 05,06 and 07, KW Blue Pearl, Karol Bagh, New Delhi,Central Delhi -110055","lat":28.6454,"lon":77.193,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Rajouri Garden","address":"J-12/41, Rajouri Garden Main Ring Road, C 4, Ground Floor, Opposite Rajouri Garden Metro Station, New Delhi, Delhi 110027","lat":28.64343,"lon":77.12252,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Punjabi Bagh","address":"2/80- A, Ground Floor, Plot No-2, Road No. -80, Punjabi Bagh, Punjabi Bagh West, Delhi -110026","lat":28.66593,"lon":77.12714,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Rajnagar","address":"Plot No.1, Raj Nagar Enclave, Pitampura, New Delhi, North West Delhi, Delhi, 110034","lat":28.68558,"lon":77.13969,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Ch-Chowk","address":"55\u009656, Near Fatehpuri Masjid, Fountain Chowk-Chandni Chowk, Old Delhi, Delhi 110006","lat":28.6566,"lon":77.23172,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"C.P","address":"Shop No. 3 & 4, 6,L Block Outer Circle- Connaught Place, New Delhi, Delhi 110001,","lat":28.6344,"lon":77.22223,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"PITAMPURA","address":"Shop No. G?16/17, D Mall, 1St Floor Netaji Subhash Place-Pitampura ew Delhi, Delhi 110034","lat":28.69284,"lon":77.15289,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Model-T","address":"Shop No. 2, Plot 15/16, F Block B-2, Basement, Ground And First Floor Gujranwala Town, Part-1-Model Town, New Delhi, Delhi 110009","lat":28.70456,"lon":77.1895,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Janpath","address":"Shop No. 5\u00966, Janpath Market, 70,Janpath, Near Connaught Place, New Delhi, Delhi 110001","lat":28.6283,"lon":77.21984,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"IRCTC","address":"No. 11, Pop N Hop, Food Court Counter 11, First Floor, IRCTC Food Plaza, New Delhi Railway Station (NDLS), New Delhi, Delhi 110002/110055","lat":28.6434,"lon":77.2215,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"NSP.1","address":"SH/GH/24, Ground Floor, Pacific Mall, NSP Metro Station, Netaji Subhash Place, Pitampura, New Delhi, Delhi 110034","lat":28.64343,"lon":77.22145,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"NSP-2","address":"SH/GF/24,Netaji Subhash Place, Pink Line, Metro Station, MRTS Station-DMRC Phase-III Corridor, New Delhi, Delhi 110034","lat":28.69507,"lon":77.15419,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Bikaner- H","address":"Bikaner House, Pandara Flats, Man Singh Road Area, New Delhi, Delhi 110003","lat":28.60963,"lon":77.22899,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Omaxe Chandini Chowk","address":"SF/51, SF/51A\u009656, Omaxe Mall, HC Sen Marg, Gandhi Maidan, Chandni Chowk, New Delhi \u0096 110046","lat":28.65781,"lon":77.23113,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Madhuban Chowk","address":"Ground Floor, Commercial Complex, RCube Mall, Near Madhuban Chowk, Vats Market, Saraswati Vihar, Pitampura, New Delhi \u0096 110034","lat":28.70338,"lon":77.13102,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"JNKP","address":"Unity One Mall, Near West Metro Station, Narang Colony, Janakpuri, New Delhi-110058","lat":28.62881,"lon":77.07634,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"ROHINI","address":"PN 1/B/5, Twin District Center, D Mall, Mahavir Marg, Near Rohini?West / Swarn Jayanti Park, Sector?10, Rohini, New?Delhi, Delhi 110085","lat":28.7163,"lon":77.1145,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"JWH","address":"ARSS Mall, Jwala Heri Market, Paschim Vihar, New Delhi, Delhi 110063","lat":28.66904,"lon":77.10154,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"NSP 3","address":"Unity One Elegante Mall, Unit No. T 12, Third Floor, Food Court Netaji, Subhash Place, Pitampura Rohini, North West Delhi, Delhi - 110034","lat":28.69547,"lon":77.15203,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"TIS HAJARI","address":"Shop No.3, Ground Floor, PD Area, Tis Hazari Metro Station, Delhi-110054","lat":28.66743,"lon":77.21652,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SAHARA MALL - RO404","address":"Block?A, Shopping Complex, Sahara Mall, M.G. Road, Chakarpur, Sector?28, Gurugram, Haryana 122001","lat":28.4804,"lon":77.08729,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SEC 29 - RO425","address":"Shop No. 316, Huda Market, Near Rana Motors, Sector 29, Gurugram, Haryana?122009","lat":28.46379,"lon":77.06521,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"ELEMENT ONE - RO419","address":"Element One, Block-B, Ground Floor, Unit No- BG BG-01, Sec-47 & 49 Gurgaon, Haryana-122018","lat":28.4202,"lon":77.05088,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"VATIKA - RO422","address":"Block-3, Vatika Business Park, Unit No. Unit No. GF-01 & GF-01A, Sector-49, Gurugram, Haryana- 122018","lat":28.40628,"lon":77.04509,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIPL - RO432","address":"AIPL-Joy Street, Block-A, Shop No.-001-005 D, Ground Floor, Sector-66 , Gurgaon, Gurugram, Haryana-122001","lat":28.39231,"lon":77.05913,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"FORTIS - RO408","address":"Food Court, Complex, Fortis Hospital Road, Fortis Memoral Research Institue, Sec-44, Gurgaon Haryana 122001","lat":28.45674,"lon":77.0726,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"ARDEE MALL - RO423","address":"located at Ardee Mall, Unit No. 03 & 04, First Floor in the Food Court, Sector-52, Gurugram, Haryana.","lat":28.44508,"lon":77.08084,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIRIA MALL - RO435","address":"Haldiram's AIRIA MALL, Aria Mall Sec-68, Gurugram 122101","lat":28.38315,"lon":77.05237,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"RO433JAIPUR135","address":"B-2, NH-8, Riico Indl. Area, Behror Rajasthan , Behror, Alwar, Rajasthan, 310701","lat":27.90156,"lon":76.30255,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"RO434DELHI135","address":"GF/2 NH-8, RIICO IND AREA, BEHROR, DISTRICT-ALWAR, RAJASTHAN PIN-310701","lat":27.9015,"lon":76.30253,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"RO446REWADI","address":"Plot No.54- 57,Ground Floor and 1st Floor Sector-26, Garhi bolni Road, Rewari 123401","lat":28.16208,"lon":76.62969,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"RO409BHIWADI(RAJ)","address":"Shop No. GF/32 & FF/39, 1st Milestone, V- square Mall, Alwar Bhiwadi bye pass, Bhiwadi,Alwar Rajasthan 301019","lat":28.19482,"lon":76.81227,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"KHERKI DHULA - RO401NH8","address":"Ground Floor, CX2M+VCH, NH-8 Delhi - Jaipur Highway, Kherki Dhaula, Sector?84 Gurgaon Haryana 122012","lat":28.40202,"lon":76.98924,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"WHITELAND-RO441","address":"A01 & 02, Whiteland Corporation Pvt Ltd, Begumpur Khatola, C229+C5, Sector 71, Gurugram, Haryana 122004","lat":28.40198,"lon":77.01763,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SOHNA","address":"GF & FF Khewat/Khata No-1396/1664, Mustail No-189, Ward No-4, Main Delhi Alwar Road, Near Raghav Vatika, Sohna, Gurugram, Haryana-122103","lat":28.24963,"lon":77.07087,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"IRIS BRODWAYS - RO428","address":"Unit No-130 to 134, Ground Floor at Iris Brodways, Block-A, Sec-85 &86 Gurugram, Haryana- 122012","lat":28.40416,"lon":76.94758,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"THREE ROAD(K-3) - RO426","address":"Ground Floor, Retail Complex, GF?01A to GF?01E, Three Road, Sector 70, Gurugram, Haryana 122018","lat":28.3917,"lon":77.03033,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"WORLD MARK - RO429","address":"1st Floor, Food Court (Food Court No. 1), World Mark Tower?3, Maidawas Road, Sector?65, Gurugram, Haryana?122018","lat":28.39814,"lon":77.07188,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"MGFMALL - RO403","address":"3rd Floor, MGF Metropolitan Mall, Mehrauli?Gurgaon Rd, near MGF Metro Station, DLF Phase?2, Sector?25, Gurugram, Haryana 122009","lat":28.48113,"lon":77.08033,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"CYBER HUB - RO414","address":"Shop Nos. 114, 115 & 116, Cyber Hub, DLF Cyber City, Sector?24, Gurugram, Haryana?122002","lat":28.49576,"lon":77.08855,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AMBIENCE - RO405","address":"3rd floor, Ambience Mall, No 309 & 310, DLF Phase 3, Gurugram, Haryana 122010","lat":28.50312,"lon":77.09694,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"PALAM VIHAR - RO417","address":"Shop No 58 to 60, Global Foyer Mall, H Block, Pocket H, Sector 1, Palam Vihar, Gurugram, Haryana 122017","lat":28.51152,"lon":77.04004,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SEC 14 - RO431","address":"Located at SCO-17, Sector-14, Gurgaon, Gurugram, Haryana-122007","lat":28.47636,"lon":77.04505,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SATYA-RO436","address":"Satya The Hive, Ground Floor, Unit Nos - A2-17 (Part-1), to A2-26 Village- Dhankot, Sector-102,Gurgaon Haryana-122505","lat":28.47244,"lon":76.96293,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"ELANMIRACLE- RO439","address":"GF-147A, 147B, 147C, 147D, 147E, Elan Miracle, Sector 84, Gurugram-122004, Haryana.","lat":28.41527,"lon":76.96394,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"KLJ Square-RO440","address":"GF 45, Tower A, KLJ Square, Villag Sikohpur, Sector 83, NH 8 Gurgaon, Haryana-122002","lat":28.39074,"lon":76.97506,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"M3M-RO443","address":"Shop No to 12, H Block, Sushant Lok 03, Triga, Gurugram, Samaspur, Haryana 122011","lat":28.42399,"lon":77.07499,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF GARDEN","address":"Shop No, DLF Garden City, 5 & 6, 18 to 20, Arcade, Sector 92, Gurugram, Haryana 122505","lat":28.40359,"lon":76.91281,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF DOWN TOWN","address":"DT4, DLF DOWN TOWN, Ambience Island, DLF Phase 3, Sector 25, Gurugram, Haryana 122010","lat":28.50332,"lon":77.09661,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"MUMBAI EXP","address":"PATH Recharge, CH. 125 650 RHS at Delhi Mumbai Expressway Alwar, Pinan, Rajasthan -301413 , ALWAR-301413 , Rajasthan-08","lat":27.79346,"lon":77.01129,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DMEXW","address":"Chainage 63 ,Delhi Mumbai Expressway (Bharatmala Pariyojna ) Firozpur Jhirkha Nuh 121004 , Firozpur-121004 , Haryana-06","lat":27.28266,"lon":76.77187,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad-2 (Crown Int.)","address":"Faridabad-2-RO110 Reliance Mart Crown Interiorz, -Faridabad 121003","lat":28.47002,"lon":77.30691,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad Sec-28","address":"Amolik City Life Mall, Main Mathura Road (NH-19), Near Metro Pillar No. 619, Rajendra Colony, Sector 28, Faridabad, Haryana \u0096 121008","lat":28.43486,"lon":77.3099,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad Sec-16","address":"SCO No-92, HUDA Staff Colony, Sector-16, Faridabad, Haryana 121002","lat":28.41211,"lon":77.3199,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"BALLBGARH","address":"nan","lat":28.34956,"lon":77.32945,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad-1","address":"Faridabad-1-RO107 Parsvnath City Mall, Faridabad- 121007","lat":28.38369,"lon":77.31431,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Pacific Mall, NIT Faridabad","address":"Pacific Mall, NIT Faridabad-RO140 FCC4F13, Fourth, NIT, Bus Terminal, Pacific Mall, Near, BK Chowk, New Industrial Township, Faridabad, Haryana 121001","lat":28.38726,"lon":77.29894,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"PALWAL","address":"RO1045-PALWAL GF & FF Plot No.215 Khetwat 2443/2443, Mustil 61 Bhadana Plaza Colony, Gandhi Ashram, Palwal, Haryana- 121102","lat":28.15531,"lon":77.32913,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad Sec-21","address":"GF, FF, SF, SCO no. 135, Sector 21c market Faridabad Haryana -121001","lat":28.43085,"lon":77.2962,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"NFC","address":"NFC-RO115 15 Community Center, New Friends Colony, New Delhi- 110025","lat":28.56306,"lon":77.26879,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Jasolla - Jasola Vihar","address":"Plot No 10, Shop No JA009, Jasola, New Delhi-110025","lat":28.53888,"lon":77.28987,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Mathura Road H8","address":"No?B?1/E?9, Mathura Road (H?8), Near Mohan Estate Metro Station, Block?B, Mohan Cooperative Industrial Estate, Badarpur, New Delhi, Delhi 110044","lat":28.51863,"lon":77.29429,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Pacific Jasola","address":"FCC2F12, 2ND FLOOR, PACIFIC MALL, Jasola, New Delhi-110025","lat":28.53772,"lon":77.28297,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Nehru Place","address":"Paras Cinema, Plot No-1, Nehru Place, New Delhi- 110019","lat":28.54722,"lon":77.25143,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Kalka ji","address":"L-43, Kalkaji, New Delhi-110019","lat":28.54257,"lon":77.2534,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Tughlakabad Ex","address":"TA 98, GALI NO 3, ROAD NO 13, Okhla Estate Marg, Tughlakabad Extension, New delhi 110019","lat":28.52663,"lon":77.25771,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"PACIFIC NIT BATA CHOWK SEC20","address":"Sector 20B, Faridabad, Bata Chowk Faridabad Pacific Mall, Sector 20B, 121001","lat":28.40204,"lon":77.31023,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"RPS","address":"RPS 12TH AVENUE, 12/6 MILESTONE, SECTOR-27C, MAIN MATHURA ROAD, FARIDABAD, HARYANA- 121003","lat":28.47254,"lon":77.30415,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad sec-81","address":"Amolik City Walk, Sector-81 Faridabad 121004","lat":28.38882,"lon":77.35,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SEC 15","address":"SCF?33, Market, Sector?15, Faridabad Haryana -121007","lat":28.3953,"lon":77.32423,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad sec-11","address":"Sector 11D, Faridabad SCF-24, Pocket?D, Faridabad, Haryana 121006","lat":28.37244,"lon":77.31967,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"KALINDI KUNJ","address":"Unit No. 5, Ground Floor, Commercial Complex, Kalindi?Kunj, Madanpur?Khadar, New?Delhi, Delhi 110076","lat":28.54293,"lon":77.31024,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Green Park","address":"R-11, Block A, Green Park Extension, Green Park, New Delhi, Delhi 110016","lat":28.55701,"lon":77.20556,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Malviya Nagar","address":"C-9, C- Block Market, Near Metro Station, Malviya Nagar, New Delhi-110017","lat":28.53648,"lon":77.21132,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Katwaria Sarai","address":"F-126, Ground Floor, Katwaria Sarai, New Delhi- 110016","lat":28.54078,"lon":77.18532,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF Vasant Kunj","address":"FC-6, Dlf Food Court, DLF Mall, Vasant Kunj, New Delhi-110070","lat":28.54296,"lon":77.15558,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Vasant Square Mall","address":"Vasant Square Mall Ground Floor, Vasant Kunj, New Delhi- 110070","lat":28.52506,"lon":77.15639,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Chatarpur","address":"Shop No. D/92, 100 Feet Road, Phase?2, Chhatarpur Enclave, New Delhi- 110074","lat":28.50217,"lon":77.18595,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Paras Trade Tower","address":"SHOP NO. 65,66 & 82 GROUND FLOOR & SHOP NO. 166 TO 176 FIRST FLOOR, COMMERCIAL COMPLEX, PARAS TRADE CENTER, SECTOR 2, GWAL PAHARI, GURUGRAM, HARYANA-122003","lat":28.43652,"lon":77.13452,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Lajpat Nagar","address":"No. 45, Ring Road, Lajpat Nagar?III, New Delhi, Delhi?110024 (Lajpat Nagar 1)","lat":28.56563,"lon":77.23812,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Lajpat Nagar-3","address":"15, 2nd Floor, Commercial Complex, 3CS Mall, Firoz Gandhi Marg, Lajpat Nagar?III, New Delhi, Delhi?110024 (Lajpat Nagar-3)","lat":28.56816,"lon":77.24116,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Lajpat Nagar-2","address":"Plot No.?C/53\u009654, Veer Savarkar Road, Lajpat Nagar?II (near Defence Colony) New Delhi, Delhi?110024, (Lajpat Nagar-2)","lat":28.57146,"lon":77.23841,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Jangpura","address":"Ground Floor, Cinema Plot, Eros Road, Block H, Jungpura Extension, New Delhi, Delhi 110014","lat":28.58133,"lon":77.24222,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Sarojini Nagar","address":"Shop No-31 & 103, Sarojni Nagar, New Delhi-110023","lat":28.5766,"lon":77.19473,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Anupam Saket","address":"Plot No 3, Community Center (Anupam Cinema), Saket, New Delhi- 110017","lat":28.52381,"lon":77.20725,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF Saket","address":"A-4, DLF Mall, Saket, New Delhi- 110019","lat":28.52763,"lon":77.21706,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIRPORT","address":"MS 1-4, ACB, Airport Connecting Building/Metro building, T-3 Terminal, Airport, New Delhi- 110037","lat":28.5576,"lon":77.08324,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"KOTLA","address":"Plot No. 1509, Bhishma Pitamah Marg, Wazir Nagar, South Extension-1, Kotla New Delhi \u0096 110003","lat":28.57001,"lon":77.2262,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"MATHURA ROAD","address":"No?B?1/E?9, Mathura Road (H?8), Near Mohan Estate Metro Station, Block?B, Mohan Cooperative Industrial Estate, Badarpur, New Delhi, Delhi 110044","lat":28.51865,"lon":77.2943,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Gannaur","address":"Food Forum, Ganaur, Gannaur, Haryana?131101","lat":29.12852,"lon":77.04281,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"MURTHAL","address":"51 Mile Stone, Near Hawai Adda Restaurant, Murthal, GT Karnal Road, Haryana-131001","lat":29.04859,"lon":77.06644,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Ambala","address":"Shop No.1,Grnd Flr NDI Plaza,Mohra, Haryana-133004","lat":30.26081,"lon":76.85417,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Zirakpur","address":"C/O Agr Hospitality Pvt.Ltd.Dear bassai Janetapur ,Delhi Chandighar Haighway,Punab-140506","lat":30.65081,"lon":76.82198,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali","address":"S 11A& B,2F,VR Punjab Mail NH2 Mohali kharar road, S.A.S Nagar Haryana -133004","lat":30.74242,"lon":76.67704,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali 67","address":"CP67 Mall, Sector 67, SAS Nagar, Mohali, Punjab-160062","lat":30.67798,"lon":76.72336,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Chand?garh","address":"SCO 22 , Madhya Marg , Sector 26 , Chandigarh , Pin Code - 160019","lat":30.72775,"lon":76.80345,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali -City","address":"Mohali City Centre, City Centre, F Block, GMADA Aero-city, Sahibzada Ajit Singh Nagar, Punjab 140306","lat":30.63596,"lon":76.76018,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali Walk","address":"Unit No 6, 3rd Floor, Walk Sohana, Sector 62, Sahibzada Ajit Singh Nagar, Punjab 160062","lat":30.6971,"lon":76.73238,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Karnal-2","address":"NH-1, Village-Bastara Tehsil-Gharaunda, Main GT Road Milestone 109 Karnal-132114","lat":29.5688,"lon":76.97598,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"OMAXE SAS NAGAR","address":"SHOP NO-1,2,4,5,8,9,10. GROUND FLOOR OMAXE INTERNATIONAL- TRADE CENTRE TRADE TOWER,VILAGE BHARAUNJIA,KHARAR ,SAS,SAS NAGAR ,MOHALI -3 MOHALI,PUNJAB-140901.","lat":30.8224,"lon":76.73495,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Jurassic Park","address":"Jurassic Park 33 milestone, NH 44 Murthal, GT Karnal Road Commercial Complex No. 4, Kumaspur, Sonipat, Haryana \u0096 131027","lat":29.009,"lon":77.0806,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Hisar","address":"Drive Through-1, Green Valley, Plot No-3572, GT Road, Hisar, Haryana-125003.","lat":29.0992,"lon":75.9067,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Barnala","address":"HG Eaton Plaza, NH 7, Near Zaildar Dhaba, Distt: Barnala, Punjab. 148107","lat":30.3284,"lon":75.48435,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Moga","address":"HG EATON SHOPPING COMPLEX NEAR NEELAM CINEMA LUDHIANA MOGA PUNJAB -142001","lat":30.8197,"lon":75.21365,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Amritsar","address":"Marigold Business Park, SC) 35-36 D Block (97 Acre scheme), Ranjit Avenue, Amritsar, Punjab-143001","lat":31.65533,"lon":74.85599,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Amritsar-2","address":"Marigold Business Park, SCO?35\u009636, Block?D, Ajnala Road, near 97 Crescheme, Ranjit Avenue, Amritsar, Punjab 143001 (Amritsar-2)","lat":31.6554,"lon":74.85595,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Jalandhar","address":"A-23, Ground Floor, East wood Village, Jalandhar Phagwara, GT Road, Khajurla, Kapurthala, Punjab-144411","lat":31.2744,"lon":75.68477,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Ludhiana","address":"220L,221L,221R MODAL TOWN, LUDHIANA 141002 PUNJAB","lat":30.8866,"lon":75.8471,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Shimla","address":"Khasra No. 182, 185, 186,184/1, Ram Sons Himachal Fantasia, Chandigarh-Shimla Highway, Himachal Pradesh-173220","lat":30.8721,"lon":76.9954,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Patiyala","address":"THE EMPIRE(GEDI ROUTE) VILLAGE Shooping Complex Katra Diss-Reasi MULTANPUR,PATIALA RAJPURA PATIALA-140401(NEAR JASDEV SINGH SANDHU COLLEGE) Bock-C, SHOP NO-103","lat":30.4303,"lon":76.5102,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Doraha","address":"Creek Side Village, NH-44, Grand Trunk road Doraha, Ludhiana, Punjab 141421","lat":30.7852,"lon":76.0509,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Balachur","address":"Ground Floor, Garhi Kangoo, Balachaur Sub Post Office, Shaheed Bhagat Singh Nagar, Village Garhi Kanugoan -144521 Balachaur","lat":30.3285,"lon":75.4844,"eta":"10:00:00 AM"}];
+// ─── Zone color palette ───────────────────────────────────────────────────
+const ZONE_COLORS = [
+  '#2d6a4f','#457b9d','#e76f51','#9b5de5','#f4a261',
+  '#06d6a0','#118ab2','#ef476f','#ffd166','#073b4c',
+  '#6a994e','#bc4749','#386641','#6c584c','#a7c957'
+];
+
+function getZoneColor(idx) { return ZONE_COLORS[idx % ZONE_COLORS.length]; }
+
+// ─── Zone detection from address/coordinates ──────────────────────────────
+function detectZone(outlet) {
+  const addr = (outlet.address || '').toLowerCase();
+  const outletName = (outlet.outlet || outlet.outletName || '').toLowerCase();
+  const customer = (outlet.customer || outlet.customerName || '').toLowerCase();
+  const combined = addr + ' ' + outletName + ' ' + customer;
+
+  // Priority order: specific areas first
+  if (/chandigarh|mohali|panchkula|zirakpur|kharar/.test(combined)) return 'Chandigarh / Mohali';
+  if (/amritsar/.test(combined)) return 'Amritsar';
+  if (/jalandhar/.test(combined)) return 'Jalandhar';
+  if (/ludhiana/.test(combined)) return 'Ludhiana';
+  if (/moga/.test(combined)) return 'Moga';
+  if (/barnala/.test(combined)) return 'Barnala';
+  if (/patiala|patiyala/.test(combined)) return 'Patiala';
+  if (/doraha/.test(combined)) return 'Doraha';
+  if (/balachur/.test(combined)) return 'Balachaur';
+  if (/shimla/.test(combined)) return 'Shimla';
+  if (/ambala/.test(combined)) return 'Ambala';
+  if (/karnal|gharaunda/.test(combined)) return 'Karnal';
+  if (/murthal|gannaur|sonipat/.test(combined)) return 'Sonipat / Murthal';
+  if (/hisar/.test(combined)) return 'Hisar';
+  if (/meerut/.test(combined)) return 'Meerut';
+  if (/ghaziabad|indirapuram|vaishali|vasundhara/.test(combined)) return 'Ghaziabad';
+  if (/greater noida|gaur city|knowledge park/.test(combined)) return 'Greater Noida';
+  if (/noida sec-14[0-9]|noida sec 14[0-9]|noida-141|noida141/.test(combined)) return 'Noida (South)';
+  if (/noida/.test(combined)) return 'Noida';
+  if (/faridabad/.test(combined)) return 'Faridabad';
+  if (/palwal/.test(combined)) return 'Palwal';
+  if (/ballabgarh|bahadurgarh/.test(combined)) return 'Ballabgarh';
+  if (/rewari/.test(combined)) return 'Rewari';
+  if (/sohna/.test(combined)) return 'Sohna';
+  if (/bhiwadi/.test(combined)) return 'Bhiwadi';
+  if (/behror/.test(combined)) return 'Behror';
+  if (/jasper|jasper associates|pragati vihar/.test(combined)) return 'Faridabad';
+  if (/manesar|ime imt/.test(combined)) return 'Manesar';
+
+  // Delhi zones
+  if (/rohini|pitampura|shalimar|nsp|netaji subhash/.test(combined)) return 'Delhi – North West';
+  if (/dwarka|palam|kapashera|uttam nagar|janakpuri|vikas puri|vikaspuri/.test(combined)) return 'Delhi – West / Dwarka';
+  if (/shahdara|dilshad|preet vihar|krishna nagar|mayur vihar|nirman vihar/.test(combined)) return 'Delhi – East';
+  if (/connaught|cp\b|paharganj|karol bagh|pusa road|new delhi railway|ndls/.test(combined)) return 'Delhi – Central';
+  if (/saket|malviya|vasant kunj|vasant vihar|green park|hauz khas|sarojini/.test(combined)) return 'Delhi – South';
+  if (/lajpat|jangpura|jasola|kalkaji|nehru place|tughlakabad|cr park/.test(combined)) return 'Delhi – South East';
+  if (/aerocity|airport|cargo/.test(combined)) return 'Delhi – Airport';
+  if (/narela/.test(combined)) return 'Delhi – North';
+  if (/adarsh nagar|kingsway|gtb nagar|model town|mukherjee/.test(combined)) return 'Delhi – North Central';
+  if (/punjabi bagh|rajouri|kirti nagar|moti nagar|paschim vihar|tilak nagar/.test(combined)) return 'Delhi – West Central';
+  if (/tagore garden|subhash nagar|jail road/.test(combined)) return 'Delhi – West Central';
+  if (/gurugram|gurgaon|sector-1[0-9]|sec-[0-9]|sohna road|cyber city|udyog vihar|dl[f]|dlf/.test(combined)) return 'Gurugram';
+
+  // lat/lon fallback
+  const lat = outlet.lat, lon = outlet.lon;
+  if (!lat || !lon) return 'Other';
+  if (lat > 30) return 'Punjab / Haryana (North)';
+  if (lat > 29.5 && lon < 77.2) return 'Karnal';
+  if (lat > 29 && lat <= 29.5) return 'Sonipat / Murthal';
+  if (lon > 77.4) return 'Greater Noida';
+  if (lon > 77.2 && lat < 28.7) return 'Noida';
+  if (lat > 28.65 && lon < 77.2) return 'Delhi – North West';
+  if (lat > 28.6 && lon > 77.25) return 'Delhi – East';
+  if (lat > 28.62 && lon < 77.12) return 'Delhi – West / Dwarka';
+  if (lat > 28.55 && lat <= 28.65) return 'Delhi – Central';
+  if (lat < 28.55 && lon > 77.2) return 'Delhi – South East';
+  if (lat < 28.55 && lon < 77.2) return 'Delhi – South';
+  if (lon < 77.1) return 'Gurugram';
+  return 'Other';
+}
+
+// ─── Master Data ──────────────────────────────────────────────────────────
+const MASTER_DB = [{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower B","address":"Tower-B,Sector-15 Part-II , Village Silokhera , Unitech Signature Tower-II , Gurgaon-122001 , Haryana-06","lat":28.46095,"lon":77.04836,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Tower C - GOVO","address":"TATA INTELLION PARK KHEWAT NO. 221/274 VILLAGE BEHRAMPUR , GURUGRAM-122004 , Haryana-06","lat":28.41312,"lon":77.11731,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"Compass Tower D","address":"L6 - L9, Signature Towers III,Tower B (SIGD), Sector 15,Part II,B1,B2,GF -L10,Kitchen , Cafe in L1 , Gurgaon-122002 , Haryana-06","lat":28.46154,"lon":77.04937,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"AMEX","address":"Sub Tehsil Kadipur , Sector 74A, Manesar Urban Complex Begumpur Khatola , Gurgaon - 122005 , , GURGAON-122005 , Haryana-06","lat":28.40398,"lon":77.00242,"eta":"3:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"GOC -TIP-2","address":"Tata Intellion Park,Khewat No.221/274,Village Behrampur Golf Course Extension,Near Sector 59 , Gurugram-122004 , Haryana-06","lat":28.4129,"lon":77.11735,"eta":"12:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"CPU","address":"Pace City-II Urban Estate , 736-E-P, Sector-37-II , Gurgaon - 122018 , India , Gurgaon-122018 , Haryana-06","lat":28.43097,"lon":76.99088,"eta":"2:00:00 PM"},{"customer":"Compass India Food Services Private Limited (HR)","outlet":"TRILL","address":"Tril Commercial Centre,Tower B , Killa No 12/2 13/1 13/2 14/1,Google Connect Services India Pvt Ltd , Gurgaon-122002","lat":28.4024,"lon":77.03847,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-14)","outlet":"DANA CHOGA (SEC-14)","address":"Shop no 7 & 8, Old Delhi Gurgaon Road, Atul Kataria Chowk Sec-14 , Gurugram-122015 , Haryana-06","lat":28.48255,"lon":77.04957,"eta":"12:00:00 PM"},{"customer":"Dana Choga Foods And Hospitality PVT LTD","outlet":"DC1 (Quatab plaza)","address":"No.F, 6, Qutab Plaza Road, DLF Phase 1, Sector 26A , Gurgaon122002 , Haryana-06","lat":28.47223,"lon":77.10214,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-22)","outlet":"DANA CHOGA (SEC-22)","address":"Gate No 2 Shiva Tower Ground Floor Near TVS Simran Maruti Udyog , Gurugram-122001 , Haryana-06","lat":28.50401,"lon":77.06897,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE Nirvana Country","outlet":"Nirvana","address":"B-119, Nirvana Country, Sector 50, Gurugram , Gurugram122018 , Haryana-06","lat":28.41412,"lon":77.066,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE","outlet":"Sec-83","address":"F 121 1st FLOOR , Sapphire Mall, Sector 83, Gurugram , 122012 -Gurugr , Haryana-06","lat":28.39293,"lon":76.96716,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA FOODS AND HOSPITALITY PRIVATE (SEC-47)","outlet":"ILd Sector 47","address":"Shop no. 101, ILD Trade Tower, Sector 47, Gurugram , Gurugram-122018 , Haryana-06","lat":28.42513,"lon":77.03894,"eta":"12:00:00 PM"},{"customer":"DANA CHOGA (SEC-54)","outlet":"DANA CHOGA (SEC-54)","address":"Shop no 2,Ground Floor ,Time Centre, Golf Course Rd, Sector 54, Gurugram","lat":28.43552,"lon":77.10493,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 16 Faridabad","outlet":"Salad Days - Sector 16 Faridabad","address":"SCF No. 40, Ground Floor, Near Post Office, Sector 16-A Market, Part-1, Faridabad, Haryana- 121002","lat":28.41164,"lon":77.31383,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Udyog Vihar","outlet":"Salad Days - Udyog Vihar","address":"250, Udyog Vihar Phase 1, Gurugram, Haryana 122016","lat":28.50935,"lon":77.0835,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sushant Lok","outlet":"Salad Days - Sushant Lok","address":"C-101,102,103 G.F, Sushant Shopping Arcade, Sushant Marg, Sushant Lok-1, Gurugram, Haryana 122009","lat":28.46074,"lon":77.07851,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Golf Course Road","outlet":"Salad Days - Golf Course Road","address":"Unit No. 1, Ground Floor, Times Centre, Sector 54, Golf Course Road, Gurgaon 122001","lat":28.43556,"lon":77.10497,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 65 Tee Point","outlet":"Salad Days - Sector 65 Tee Point","address":"Shop No. 25, M3M Tee Point, Block 2, Sector - 65, Gurugram, Haryana 122001","lat":28.39834,"lon":77.06423,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 82 Town Square","outlet":"Salad Days - Sector 82 Town Square","address":"245, First Floor, A1 Block, Vatika Town Square-2, Sector 82, Gurugram, Haryana 122004","lat":28.39027,"lon":76.95928,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 48 Sohna Road","outlet":"Salad Days - Sector 48 Sohna Road","address":"Shop no. 11, First Floor, Omaxe Celebration Mall, Sector 48, Subhash Chowk, Gurgaon, Haryana- 122001","lat":28.4277,"lon":77.03623,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Sector 106 Gurgaon","outlet":"Salad Days - Sector 106 Gurgaon","address":"Shop no. GF-9 & GF-10, Tower B2, Ground Floor, Plaza at 106, Sector 106, Gurgaon, Haryana- 122006","lat":28.50381,"lon":76.99283,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Gaur City 2","outlet":"Salad Days - Noida Gaur City 2","address":"Shop no. 52 & 53, First floor, Gaur City Centre, Greater Noida West","lat":28.60577,"lon":77.42748,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sector 6","outlet":"Salad Days - Noida Sector 6","address":"C-28, FIRST FLOOR, SECTOR 6, NOIDA, GAUTAM BUDDHA NAGAR- 201301","lat":28.59539,"lon":77.31973,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sector 46","outlet":"Salad Days - Noida Sector 46","address":"Shop No. 15 & 16, Upper Ground Floor, Tulip Malls, Sector 46, Noida","lat":28.5493,"lon":77.36304,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Indirapuram","outlet":"Salad Days - Indirapuram","address":"CS 5, First Floor, Gyan Khand 2, Above HDFC Bank, Indirapuram GZB, Ghaziabad","lat":28.64503,"lon":77.35202,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Greater Noida","outlet":"Greater Noida","address":"Shop no. 22, 23; First Floor, GM Mall; Jagat Farm; Greater Noida","lat":28.48143,"lon":77.50027,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (Noida Sec-73)","outlet":"Salad Days - Noida Sector 73","address":"Shop no. 4 and 5 first floor block A AR Complex 1 Sarfabad, Sec73, Noida","lat":28.57995,"lon":77.38537,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Noida Sec-141","outlet":"Noida Sec-141","address":"Noida Sec-141, Shop no. 3, Ground Floor, House no. 67, Sector 141, Village Shahdara, Noida","lat":28.50622,"lon":77.4155,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited GTB Nagar","outlet":"Salad Days - GTB Nagar","address":"48, Ground Floor, Mall Road GTB Nagar, Delhi-110009","lat":28.69769,"lon":77.20763,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited","outlet":"Salad Days - Gole Market","address":"Shop No. 130, Bhagat Singh Market, Gole Market, New Delhi, Delhi 110001","lat":28.63327,"lon":77.20723,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Rajouri Garden","outlet":"Salad Days - Rajouri Garden","address":"A-1, Shop 4, Ground Floor, Basai Dara Pur, Opposite Metro Pillar-343, Rajouri Garden, New Delhi","lat":28.65401,"lon":77.1348,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Vasant kunj","outlet":"Salad Days - Vasant kunj","address":"C-1, KH. No. 405/98, First floor, Left side, Village Masoodpur, Vasant Kunj, New Delhi","lat":28.52798,"lon":77.15147,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Malviya nagar","outlet":"Salad Days - Malviya nagar","address":"C-51, Ground Floor, Main Market, Near Laxmi Narayan Temple, C Block, Malviya Nagar, Delhi 110017","lat":28.53789,"lon":77.21251,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Jangpura","outlet":"Salad Days - Jangpura","address":"37/2, Ground Floor, Church Road, Jangpura, Bhogal, New Delhi, Delhi 110014","lat":28.5821,"lon":77.2485,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Laxmi Nagar","outlet":"Salad Days - Laxmi Nagar","address":"1st floor WA-86A, Main Market, Block Wa, Shakarpur, Delhi- 110092","lat":28.628,"lon":77.27911,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited Jasola","outlet":"Salad Days - Jasola","address":"GF-7, Ground Floor, Plot No. 7, TDI Centre, Jasola, New Delhi-110025.","lat":28.53769,"lon":77.28766,"eta":"12:00:00 PM"},{"customer":"Amicus Natural Products Private Limited (Vikas Puri)","outlet":"Vikas Puri","address":"Shop No. 104, First Floor Galaxy Market Block H Block F Vikaspuri, Vikas Puri-110018, Delhi-07","lat":28.64421,"lon":77.06991,"eta":"12:00:00 PM"},{"customer":"Jubilant Foodworks Ltd (Hongs Kitchen)","outlet":"HONGS KITCHEN","address":"Greater Noida Commissary B-5, Eco Tech -1, Extension -1, Gautam Budh Nagar-201306","lat":28.44051,"lon":77.56205,"eta":"10:00:00 AM"},{"customer":"Jubilant Foodworks Ltd (Gautam Budh Nagar)","outlet":"Gautam Budh Nagar","address":"Plot No. B-5, Sector-Ecotech-1 Extension Greater Noida Industrial Development B-6 Area, Noida-201306","lat":28.44049,"lon":77.56201,"eta":"10:00:00 AM"},{"customer":"Reliance Retail Limited","outlet":"Milk basket noida","address":"A-154 Sec 63 Noida, Noida-201301, Uttar Pradesh-09","lat":28.62086,"lon":77.37686,"eta":"12:00:00 PM"},{"customer":"PJTJ TECHNOLOGIS PRIVATE LIMTED(HR)","outlet":"Swiggy Sonipat","address":"Sector 42 Akbarapur Barota Hadbasta No.62 Sonipat Haryana 131103","lat":28.90258,"lon":77.06625,"eta":"5:00:00 PM"},{"customer":"Jasper Associates Pvt Ltd","outlet":"Japser","address":"BUILDING NO 68-69 PRAGATI VIHAR INDUSTRIAL AREA Sector 59, Faridabad-121004, Haryana-06","lat":28.30791,"lon":77.30519,"eta":"4:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"55441 Alpha 1 Noida","address":"Subway, Shop No. G-14, Noida-201309","lat":28.47314,"lon":77.51467,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"66466 Sector 18 Noida","address":"Subway, Unit No. C-14, Ground Floor, Sector 18 Noida","lat":28.57145,"lon":77.32484,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"68891 - Indirapuram Ghaziabad","address":"Subway Shop no-147,148,149, Ground Floor Block-c, Indirapuram habitat centre, Ghaziabad","lat":28.64032,"lon":77.36867,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72169 Gulshan Mall","address":"Gulshan One 29, M/S Gulshan Homes, Noida-201301","lat":28.50825,"lon":77.38686,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72203 Advent","address":"Tower-B Unit 3A Advant Navis Business Park, Noida Expressway Sector - 142, Noida.","lat":28.50119,"lon":77.40968,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72295 Botanical Garden","address":"Botanical Garden Metro Station BG 3A Ground floor Sector 38 Noida","lat":28.56432,"lon":77.33428,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72400 Sharda Hospital, Greater Noida","address":"Unit No. 8, 2nd floor, Food Court, Emerald Mall, Greater Noida","lat":28.47392,"lon":77.48221,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72426 Blue Sapphire","address":"Shop 25, Plot No. C-03, Greater Noida W Rd, Sector 4 Greater Noida","lat":28.6076,"lon":77.43633,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"72467 - Vasundhara Ghaziabad","address":"Subway Shop no-8, UGF, KSN Square, Plot NO-12,13, Ghaziabad","lat":28.66757,"lon":77.38276,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74191 Rcube Monad Noida","address":"Stall no.6, Food court, R Cube Monad, Sector-43, Noida","lat":28.56085,"lon":77.35675,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74265 Cleo County Noida","address":"Shop No.11, Ground floor, Cleo street at Cleo county, Sector 121, Noida","lat":28.59716,"lon":77.39266,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74313 - La Gracia mall","address":"La Gracia Mall, Crossing Republic Ground Floor, Unit number G07, Ghaziabad","lat":28.63211,"lon":77.4346,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74516 North india Mall","address":"Food court No.8, 2nd Floor, North India Mall, Vaibhav Khand, Indirapuram, Ghaziabad","lat":28.63433,"lon":77.37031,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"74643 Sec 120","address":"Shop No AG-11, Ground floor, Central Market Sec 120, Sector 120, Noida","lat":28.58639,"lon":77.39887,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"Vaishali Ghaziabad","address":"Shop no ground floor atulya heights plot no 12 Vaishali sector 3, Ghaziabad","lat":28.64521,"lon":77.34137,"eta":"8:00:00 PM"},{"customer":"EVERSUB INDIA PRIVATE LIMITED(UP)","outlet":"51028 LOGIX CYBER PARK","address":"C 28 & 29, Atrium of Tower C, Logix Cyber Park, Sector 62, Noida 201306","lat":28.61266,"lon":77.36555,"eta":"8:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Tagore Garden)","outlet":"Pacific Mall Tagore Garden","address":"SH/2F/10, SECOND FLOOR, PACIFIC MALL, NAJAFGARH ROAD, TAGORE GARDEN, West Delhi","lat":28.64243,"lon":77.10577,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (VK)","outlet":"Ambience Mall Vasant Kunj","address":"RESTAURANT NO. 8 T316A, 3RD FLOOR, AMBIENCE MALL, VASANT KUNJ","lat":28.54188,"lon":77.15517,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Janak Cinema)","outlet":"Janak Cinema","address":"Shop No 9 Ground Floor Janak Cinema, Pankha Road, New Delhi","lat":28.61137,"lon":77.09369,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Unity One)","outlet":"Unity Mall Rohini","address":"27B and 27A Ground Floor D Mall Rohini Twin District Centre, Sector 10 Rohini, New Delhi","lat":28.71525,"lon":77.11603,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED ( Ansa City Centre)","outlet":"Ansa City Centre","address":"SHOP NO. FC-02 FC-03 SECOND FLOOR ANSA CITY CENTRE Raj Nagar extension, Ghaziabad","lat":28.67478,"lon":77.4402,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (ATS Ghaziabad)","outlet":"ATS Ghaziabad","address":"2nd Floor Plot No. 136 Unit No. 4,5 ATS Khyber Range Mall NH24, Pandav Nagar, Ghaziabad","lat":28.67479,"lon":77.44017,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Kamal Nagar)","outlet":"Kamal Nagar","address":"UA 27A, Malka Ganj Road, Jawahar nagar, North Delhi, Delhi, 110007","lat":28.6802,"lon":77.20832,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Kalka Ji)","outlet":"Kalka Ji","address":"Shop No. E-153, GROUND FLOOR, KALKAJI, DELHI","lat":28.54257,"lon":77.2534,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Papcific Mall Jasola)","outlet":"Papcific Mall Jasola","address":"FCC2-F05, 2nd Floor, Pacific Mall Jasola, New Delhi","lat":28.53728,"lon":77.28304,"eta":"6:00:00 PM"},{"customer":"BURMAN HOSPITALITY PRIVATE LIMITED (Epica/Moti Nagar)","outlet":"Epica/Moti Nagar","address":"Unit No. F-007 & F-008, First Floor, Epicah Mall, Moti Nagar, Najafgrarh Road, New Delhi","lat":28.65821,"lon":77.14508,"eta":"6:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Punjabi Bagh Delhi","address":"No 18 NWA, CH Balbir Singh Marg, Club Road, West Punjabi Bagh, New Delhi","lat":28.66675,"lon":77.12247,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Lajpat Nagar -DELCO-PHD","address":"K 95, VEER SAVARKAR MARG, LAJPAT NAGAR 2, Delhi","lat":28.56758,"lon":77.24667,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"Nehru Palace-PHD","address":"Shop No-8, 9 Satyam Cinema Nehru Place New Delhi","lat":28.55035,"lon":77.2508,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Jasola Dist. Center","address":"Unit No -15B-16, Splender Forum, 3 District Center, Jasola, New Delhi","lat":28.53767,"lon":77.28678,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Pitampura","address":"No 08, Ground floor, PP City Center Pitampura, Rani Bagh, New Delhi","lat":28.68986,"lon":77.13493,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Janakpuri C-1","address":"C1/113 G/Floor Janakpuri Market oopside Mata chandan Devi Hospital, New Delhi","lat":28.61948,"lon":77.07932,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Ramphal Chowk Sec-7 D","address":"E-561B, Ramphal Chowk Dwarka sec-7, New Delhi Delhi 110075","lat":28.58412,"lon":77.07153,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD City Centre Mall Dwarka","address":"No G22 - 51, PN 5, Hashtag Food Court, near Metro Station, Pocket 8, Block B, Sector 12 Dwarka, New Delhi","lat":28.59252,"lon":77.04133,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Vegas Mall Dwarka","address":"Pizza hut Shop no- T-301, Third floor, Plot No-6, Sector 14 (North) Vegas Mall, Dwarka, Delhi","lat":28.60141,"lon":77.02894,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD AeroCity","address":"P321 PHD-Aerocity, Asset No.11, Ground Floor, Worldmark-1 Aerocity, New Delhi","lat":28.55084,"lon":77.12211,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PH Sec-106 Dwarka Exp. GGN","address":"Khewat No- 442 Opp. Conscient One Sector- 106 Village- Pawala, GURUGRAM-122001","lat":28.50722,"lon":77.00578,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut - Sector- IV, GGN","address":"SCF No. 37, HUDA Market Sector 4 Gurgaon, Gurugram-122001","lat":28.47344,"lon":77.00921,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut - Sec-14, GGN","address":"SCO - 24, Sector - 14, Gurugram, Haryana, Gurugram-122002","lat":28.47591,"lon":77.04467,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Sadar Bazar GGN","address":"GF, P.No.34, SCO-34, Sector- 11, Sadar Bazar, Huda Complex Sohna Chowk, Gurugram","lat":28.45912,"lon":77.0268,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Elan Mercado","address":"Elan Marcado Mall, Naurangpur, Main NH 8, Sec-80, Tehsil Manesar Gurgaon","lat":28.37678,"lon":76.95973,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD GGN Unitech Cyber Park Sec 39","address":"P049 Pizza Hut - Cyber Park GF, Tower - C Sector-39 Unitech World, Gurugram","lat":28.4436,"lon":77.05594,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Manesar Highway","address":"PH at GF, Plot No-SCO-D-12, Sector-1, IMT-Manesar, Gurugram","lat":28.36673,"lon":76.94608,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD IRIS Broadway","address":"PH, Shop No G 145, 146, 147, GF, IRIS Broadway, Sector 85, Gurgaon","lat":28.40408,"lon":76.94775,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"FCD M3M Broadway Gurgaon","address":"GF, Golf Course Ext Rd, Sector 71, Gurugram","lat":28.40154,"lon":77.01996,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"PHD Sec-58 Gurgaon","address":"Pizza hut at shop No- 04,05,06,07 Ground floor The grand arch Sec 58, Gurgaon","lat":28.41336,"lon":77.11366,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"Pizza Hut Ambi Mall","address":"Ambi Mall, R - 2, Third Floor, Ambi Mall Ambience Island NH - 8, Gurugram","lat":28.50407,"lon":77.09697,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"FCD - Narela Delhi","address":"Shop No-43, arya samaj road Narela delhi -110040","lat":28.85701,"lon":77.0915,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD Naraina Vihar Delhi","address":"Shop No 1 to 4, Plot No 6, Industrial Area Phase I, Block B Naraina Vihar, New Delhi","lat":28.63319,"lon":77.13838,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD - Subhash Nagar-Delhi","address":"P072 PHD Subhash Nagar, Pacific Mall, Community Centre, Najafgarh Road, New Delhi","lat":28.64184,"lon":77.10502,"eta":"9:00:00 PM"},{"customer":"Devyani International Limited","outlet":"PHD AeroCity","address":"P321 PHD-Aerocity, Asset No.11, Ground Floor, Worldmark-1 Aerocity, New Delhi","lat":28.55084,"lon":77.12211,"eta":"9:00:00 PM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"PAC- MALL","address":"Opp. Metro Pillar No.464 Shivaji Marg, Subhash Nagar Pacific Mall New Delhi- 110027","lat":28.6996,"lon":77.1551,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"T.N","address":"4B/16, Shivaji Marg (Najafgarh Road), Block 4B, Tilak Nagar, New Delhi, Delhi 110018","lat":28.63928,"lon":77.10104,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-12","address":"G/5, G/6 & G/7, City Centre, Plot No. 5, Sector 12, Dwarka, New Delhi, Delhi 110078","lat":28.59307,"lon":77.04101,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"JNC","address":"Counter No. 2, Janak Cinema Complex, Plot No. C6A, Community Centre, Pankha Road, Janakapuri New Delhi","lat":28.61145,"lon":77.09298,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-14","address":"Vegas mall, Shop No. T-304,305 Third Floor Plot no 6, sector 14(North), Dwarka, New Delhi 110078","lat":28.60141,"lon":77.03004,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"DWK-21","address":"2nd Floor, Pacific Mall, Sector-21, Food Court, Second Floor, Dwarka, New Delhi 110077","lat":28.553,"lon":77.05908,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Moti Nagar","address":"17A, Shivaji Marg- Najafgarh Road-Motinagar, Karampura Industrial Area, New Delhi 110026","lat":28.6617,"lon":77.1499,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Pusa Road","address":"B-1/1, Pusa Road, Karol Bagh, 11, Ground Floor, New Delhi, Delhi 110005","lat":28.64527,"lon":77.19287,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Rajouri Garden","address":"J-12/41, Rajouri Garden Main Ring Road, C 4, Ground Floor, Opposite Rajouri Garden Metro Station, New Delhi","lat":28.64343,"lon":77.12252,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Punjabi Bagh","address":"2/80-A, Ground Floor, Plot No-2, Road No.-80, Punjabi Bagh, Delhi -110026","lat":28.66593,"lon":77.12714,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"Ch-Chowk","address":"55-56, Near Fatehpuri Masjid, Fountain Chowk-Chandni Chowk, Old Delhi, Delhi 110006","lat":28.6566,"lon":77.23172,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"C.P","address":"Shop No. 3 & 4, 6, L Block Outer Circle- Connaught Place, New Delhi, Delhi 110001","lat":28.6344,"lon":77.22223,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"PITAMPURA","address":"Shop No. G-16/17, D Mall, 1St Floor Netaji Subhash Place-Pitampura, New Delhi","lat":28.69284,"lon":77.15289,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"ROHINI","address":"PN 1/B/5, Twin District Center, D Mall, Mahavir Marg, Near Rohini West, Sector 10, Rohini, New Delhi","lat":28.7163,"lon":77.1145,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED","outlet":"TIS HAJARI","address":"Shop No.3, Ground Floor, PD Area, Tis Hazari Metro Station, Delhi-110054","lat":28.66743,"lon":77.21652,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SAHARA MALL - RO404","address":"Block A, Shopping Complex, Sahara Mall, M.G. Road, Sector 28, Gurugram, Haryana 122001","lat":28.4804,"lon":77.08729,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIPL - RO432","address":"AIPL-Joy Street, Block-A, Shop No.-001-005 D, Ground Floor, Sector-66, Gurgaon","lat":28.39231,"lon":77.05913,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"ARDEE MALL - RO423","address":"located at Ardee Mall, Unit No. 03 & 04, First Floor in the Food Court, Sector-52, Gurugram","lat":28.44508,"lon":77.08084,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIRIA MALL - RO435","address":"Haldiram's AIRIA MALL, Aria Mall Sec-68, Gurugram 122101","lat":28.38315,"lon":77.05237,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"KHERKI DHULA - RO401NH8","address":"Ground Floor, NH-8 Delhi - Jaipur Highway, Kherki Dhaula, Sector 84 Gurgaon Haryana 122012","lat":28.40202,"lon":76.98924,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"SOHNA","address":"GF & FF Khewat/Khata No-1396/1664, Main Delhi Alwar Road, Near Raghav Vatika, Sohna, Gurugram","lat":28.24963,"lon":77.07087,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"IRIS BRODWAYS - RO428","address":"Unit No-130 to 134, Ground Floor at Iris Brodways, Block-A, Sec-85 & 86 Gurugram","lat":28.40416,"lon":76.94758,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"WORLD MARK - RO429","address":"1st Floor, Food Court (Food Court No. 1), World Mark Tower 3, Sector 65, Gurugram","lat":28.39814,"lon":77.07188,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"MGFMALL - RO403","address":"3rd Floor, MGF Metropolitan Mall, Mehrauli-Gurgaon Rd, near MGF Metro Station, DLF Phase 2, Gurugram","lat":28.48113,"lon":77.08033,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"CYBER HUB - RO414","address":"Shop Nos. 114, 115 & 116, Cyber Hub, DLF Cyber City, Sector 24, Gurugram","lat":28.49576,"lon":77.08855,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AMBIENCE - RO405","address":"3rd floor, Ambience Mall, No 309 & 310, DLF Phase 3, Gurugram, Haryana 122010","lat":28.50312,"lon":77.09694,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"PALAM VIHAR - RO417","address":"Shop No 58 to 60, Global Foyer Mall, H Block, Pocket H, Sector 1, Palam Vihar, Gurugram","lat":28.51152,"lon":77.04004,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"NFC","address":"NFC-RO115 15 Community Center, New Friends Colony, New Delhi- 110025","lat":28.56306,"lon":77.26879,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Jasolla - Jasola Vihar","address":"Plot No 10, Shop No JA009, Jasola, New Delhi-110025","lat":28.53888,"lon":77.28987,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Pacific Jasola","address":"FCC2F12, 2ND FLOOR, PACIFIC MALL, Jasola, New Delhi-110025","lat":28.53772,"lon":77.28297,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Nehru Place","address":"Paras Cinema, Plot No-1, Nehru Place, New Delhi- 110019","lat":28.54722,"lon":77.25143,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Kalka ji","address":"L-43, Kalkaji, New Delhi-110019","lat":28.54257,"lon":77.2534,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Green Park","address":"R-11, Block A, Green Park Extension, Green Park, New Delhi, Delhi 110016","lat":28.55701,"lon":77.20556,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Malviya Nagar","address":"C-9, C- Block Market, Near Metro Station, Malviya Nagar, New Delhi-110017","lat":28.53648,"lon":77.21132,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF Vasant Kunj","address":"FC-6, Dlf Food Court, DLF Mall, Vasant Kunj, New Delhi-110070","lat":28.54296,"lon":77.15558,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Vasant Square Mall","address":"Vasant Square Mall Ground Floor, Vasant Kunj, New Delhi- 110070","lat":28.52506,"lon":77.15639,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Lajpat Nagar","address":"No. 45, Ring Road, Lajpat Nagar III, New Delhi, Delhi 110024","lat":28.56563,"lon":77.23812,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Lajpat Nagar-2","address":"Plot No. C/53-54, Veer Savarkar Road, Lajpat Nagar II, New Delhi, Delhi 110024","lat":28.57146,"lon":77.23841,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Jangpura","address":"Ground Floor, Cinema Plot, Eros Road, Block H, Jungpura Extension, New Delhi, Delhi 110014","lat":28.58133,"lon":77.24222,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Sarojini Nagar","address":"Shop No-31 & 103, Sarojni Nagar, New Delhi-110023","lat":28.5766,"lon":77.19473,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"DLF Saket","address":"A-4, DLF Mall, Saket, New Delhi- 110019","lat":28.52763,"lon":77.21706,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"AIRPORT","address":"MS 1-4, ACB, Airport Connecting Building/Metro building, T-3 Terminal, Airport, New Delhi- 110037","lat":28.5576,"lon":77.08324,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"MATHURA ROAD","address":"No B-1/E-9, Mathura Road (H-8), Near Mohan Estate Metro Station, Block B, Mohan Cooperative Industrial Estate, Badarpur, New Delhi","lat":28.51865,"lon":77.2943,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad-2 (Crown Int.)","address":"Faridabad-2-RO110 Reliance Mart Crown Interiorz, Faridabad 121003","lat":28.47002,"lon":77.30691,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad Sec-28","address":"Amolik City Life Mall, Main Mathura Road, Near Metro Pillar No. 619, Sector 28, Faridabad, Haryana","lat":28.43486,"lon":77.3099,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad Sec-16","address":"SCO No-92, HUDA Staff Colony, Sector-16, Faridabad, Haryana 121002","lat":28.41211,"lon":77.3199,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Faridabad-1","address":"Faridabad-1-RO107 Parsvnath City Mall, Faridabad- 121007","lat":28.38369,"lon":77.31431,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"Pacific Mall, NIT Faridabad","address":"Pacific Mall, NIT Faridabad, FCC4F13, Fourth, NIT, Bus Terminal, Pacific Mall, Near BK Chowk, Faridabad","lat":28.38726,"lon":77.29894,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"PALWAL","address":"GF & FF Plot No.215, Gandhi Ashram, Palwal, Haryana- 121102","lat":28.15531,"lon":77.32913,"eta":"10:00:00 AM"},{"customer":"Haldiram Marketing Private Limited","outlet":"BALLBGARH","address":"Ballabgarh, Haryana","lat":28.34956,"lon":77.32945,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Gannaur","address":"Food Forum, Ganaur, Gannaur, Haryana 131101","lat":29.12852,"lon":77.04281,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"MURTHAL","address":"51 Mile Stone, Near Hawai Adda Restaurant, Murthal, GT Karnal Road, Haryana-131001","lat":29.04859,"lon":77.06644,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Zirakpur","address":"C/O Agr Hospitality Pvt.Ltd. Dear bassai Janetapur, Delhi Chandighar Highway, Punjab-140506","lat":30.65081,"lon":76.82198,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali","address":"S 11A & B, 2F, VR Punjab Mail NH2 Mohali kharar road, S.A.S Nagar","lat":30.74242,"lon":76.67704,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Mohali 67","address":"CP67 Mall, Sector 67, SAS Nagar, Mohali, Punjab-160062","lat":30.67798,"lon":76.72336,"eta":"10:00:00 AM"},{"customer":"HALDIRAM MARKETING PRIVATE LIMITED (DL)","outlet":"Chand-garh","address":"SCO 22, Madhya Marg, Sector 26, Chandigarh, Pin Code - 160019","lat":30.72775,"lon":76.80345,"eta":"10:00:00 AM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Sarojini Nagar HS","address":"KFC-HS, 24-29 DLF South Square Mall, Sarojini Nagar, New Delhi","lat":28.57656,"lon":77.19511,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Vasant Kunj MS","address":"SHOP 12, VASANT SQUARE MALL, VASANT KUNJ, New Delhi","lat":28.5251,"lon":77.1566,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC BASANT LOK","address":"InLine, G05, GROUND FLOOR, PVR PRIYA, 61, BASANT LOK, VASANT VIHAR NEW DELHI","lat":28.55778,"lon":77.16426,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Malviya Nagar HS","address":"KFC-HS, Shop No. C-5, Ground Floor, Main Market, Malviya Nagar, New Delhi","lat":28.53712,"lon":77.21184,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Kalkaji HS","address":"F-4, KALKAJI MAIN ROAD, KALKAJI, NEW DELHI","lat":28.54235,"lon":77.2536,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Saket HS","address":"Community Center, Ashok Vihar, Saket, New Delhi","lat":28.52427,"lon":77.20778,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Nehru Place MFC","address":"FOOD COURT, LOWER GROUND FLOOR, TDI MALL, NEHRU PLACE, New Delhi","lat":28.55165,"lon":77.25164,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Lajpat Nagar - KFC - 5312","address":"J 23 A, CENTRAL MARKET, LAJPAT NAGAR II, New Delhi 110024","lat":28.56946,"lon":77.24277,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Hauzkhas","address":"InLine, Bare Space at Concourse level at Hauz Khas Metro Station, New Delhi","lat":28.54411,"lon":77.20621,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Subhash Nagar 1 MFC","address":"KFC Restaurant, Shop No L7, 2ND Floor, Pacific Mall, Tagore Garden, New Delhi","lat":28.6429,"lon":77.10643,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Uttam Nagar HS","address":"KFC-Hs, 167 B Ground Floor Opp Metro Pillar, No 672, Main Road Uttam Nagar, New Delhi","lat":28.62277,"lon":77.05935,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Janakpuri-1 HS","address":"Shop No 8 To 11, Inside Satyam District Center Janakpuri, New Delhi","lat":28.63052,"lon":77.08197,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL JANAK CINEMA","address":"Inline, The Janak, Janak Cinema Complex, Pankha Road Janak Puri, New Delhi","lat":28.61144,"lon":77.09371,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Mahavir Enclave HS","address":"KFC-Hs, A-Block, Plot No:4-5, Main Road Mahavir Enclave, New Delhi","lat":28.60048,"lon":77.08167,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Dwarka More","address":"Inline, B-2 Rama Park, Near Dwarka More Metro Station, New Delhi","lat":28.62669,"lon":77.03654,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Dwarka Sec-12 MFC","address":"KFC, Unit No 26, 27, Food Court, City Centre, Sector 12, Dwarka, Delhi","lat":28.59231,"lon":77.04147,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Dwarka Sec-21 MFC","address":"KFC-Hs, Pacific Mall, Second Floor, Food Court, Sec-21, Dwarka Metro Station, New Delhi","lat":28.55295,"lon":77.05911,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC TILAK NAGAR HS DL - 5384","address":"Inline NEAR TILAK NAGAR METRO STATION, DELHI","lat":28.63694,"lon":77.09698,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ARJANGARH METRO HS DL","address":"KFC ARJANGARH Metro - Outlet No 1 Ground Floor Arjun Garh Metro Station, Delhi","lat":28.48145,"lon":77.12576,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL SHALIMAR BAGH - KFC - 5357","address":"KFC Restaurant Units No -24,25 GF Plot No-2 B-Block Community Centre, West Shalimar Bagh 110088","lat":28.71311,"lon":77.1583,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Pitampura MFC","address":"KFC, Plot No 3, PP City Center, SN 19,20, Gr Flr, Rd No 44, Rani Bagh, Pitampura, New Delhi","lat":28.68954,"lon":77.13444,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ROHINI-11","address":"KFC Restaurant, Plot No:-6, Garg Trade Centre, Sector-11, Rohini, New Delhi","lat":28.73613,"lon":77.11386,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DEL Rohini -2 - KFC - 5317","address":"KFC Restaurant, Unity No-17, Unity One Rohini At Rohini West Metro Station Complex, Delhi","lat":28.71639,"lon":77.11643,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL M2K Rohini MS","address":"KFC Restaurant, 16 Mangalam Place District Centre, Sector-3, Rohini, New Delhi","lat":28.70182,"lon":77.11673,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Paschim Vihar","address":"KFC Restaurant, G-5, Pushkar Enclave, Paschim Vihar, Delhi","lat":28.66419,"lon":77.09229,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DL Najafgarh HS","address":"KFC Restaurant, Najafgarh, Plot No C9, Ground Floor, Old Roshanpura, Najafgarh, New Delhi","lat":28.60631,"lon":76.98629,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC ROHTAK HIGHWAY DT HR","address":"KFC Drive Thru, Rohtak Highway, VILLAGE ISMAILA, ROHTAK, Haryana","lat":28.78549,"lon":76.75452,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Model Town - KFC","address":"Plot No B-4, 1st Floor Gujranwala Town, Near Model town metro Station, New Delhi","lat":28.70495,"lon":77.19003,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC GTB Nagar","address":"GROUND FLOOR, GTB NAGAR, SHOP NO 85 and 87 DL GTB NAGAR HS KFC, Delhi","lat":28.69856,"lon":77.20582,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DILSHAD GARDEN","address":"Shop number 6, Grand trunk road Jhilmil industrial area, Dilshad garden, New Delhi","lat":28.67614,"lon":77.32089,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"CBD Shahdara","address":"Shop Number 12, Front side, Unity one mall, CBD Shahdara, Delhi -110092","lat":28.66092,"lon":77.29776,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Preet Vihar HS","address":"High Street, F-25, GROUND FLOOR, VIKAS MARG, DELHI 110092","lat":28.643,"lon":77.29623,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"DL Akshardham","address":"Shop no G-27, Akshardham metro station, Delhi 110092","lat":28.61819,"lon":77.27948,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC JASOLA","address":"Unit No. FCC2F17, 2nd Flr, Pacific Mall, Jasola Apollo Metro Station, Delhi","lat":28.53752,"lon":77.28292,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC Kapashera Delhi","address":"Shop No 1, Gr Floor, Khasra No 1293/1, Old Delhi Gurugram Rd, Kapas Hera, New Delhi","lat":28.52156,"lon":77.08229,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"KFC DEL Ambience MFC","address":"SHOP NO R2, 3RD FLOOR, NELSON MANDELA MARG, AMBIENCE MALL, Delhi","lat":28.50621,"lon":77.09632,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"HR Sonipat Castle Gd Plaza-KFC","address":"Drive Thru, KFC Restaurant AMR Kassel Grand Plaza, Kundli, KUNDLI-131028, Haryana","lat":28.86857,"lon":77.12372,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"HR Sonipat City Mall-KFC","address":"Shop No.6,7,8, on Ground Floor, City Mall, Baba Tarana, Next to Bus Stand, Sonipat, Haryana","lat":29.00289,"lon":77.02707,"eta":"9:00:00 PM"},{"customer":"Sapphire Foods India Limited","outlet":"(KFC- Epicah Delhi)","address":"Shop/Unit No. F-004, 1st Floor located at Epicah Avenue, Epicah Mall, 68 & 68/1, Najafgarh Road, Moti Nagar, Delhi","lat":28.65826,"lon":77.14513,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Palam Vihar, GGN","address":"S n.25 to 27, 36 to 39, Global Foyer, B-Pocket H, Sector 1, Palam Vihar, Gurugram","lat":28.51626,"lon":77.0409,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Conscient One S109, GGN","address":"K512 KFC GF, Conscient Mall One, Unit No CG 129/132/133/138/141, Sec 109, Gurugram","lat":28.50321,"lon":77.00703,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Huda Metro Station, GGN","address":"K549 KFC North Court, Huda City Centre Metro Station, Sec-29, Gurugram","lat":28.45953,"lon":77.07275,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Vatika Business Park","address":"Shop No- 001 002 GF Tower-A Vatika Business park Sector-49 Gurugram Haryana","lat":28.40663,"lon":77.04471,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Ocus Medley Sec99","address":"G-27/28/29/30/31/34/35, GF, Ocus Medley Mall, Township G99, Gurugram","lat":28.46722,"lon":76.9693,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Elan Mercado Sec80","address":"Elan Marcado Sec-80 Naurangpur, Tehsil Manesar, Delhi-Jaipur Expway Gurgaon","lat":28.37759,"lon":76.95902,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Sctor 46 Huda Market","address":"GF and FF SCO-115, Huda Market, Sector -46, Urban Estate Gurgaon II","lat":28.43436,"lon":77.05918,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Metro Mall Sec 55&56","address":"Shop No 32, 33, 60, 61, 62, Huda Market Road, Sector 56, Gurgaon","lat":28.42027,"lon":77.08997,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC Entertainland Mall Sec 83","address":"K.F.C. at Shop No- 26A & 26B, Entertainland Mall, NH-48, Sector-83, Gurugram","lat":28.39323,"lon":76.9761,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN IRIS Broadway Sec85","address":"KFC, K179, Shop No 140, 141, 131, IRIS Broadway, Sector 85, Gurgaon","lat":28.40412,"lon":76.94769,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN M3M Broadway","address":"GF R1G01 and R1G02 M3M Broadway, Village Fazilpur Jharsa Teh Badhshapur, Gurugram","lat":28.40188,"lon":77.01903,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN M3M Urbana Sec-67","address":"Shop No.G-11,12,14-15, Golf Course Extension Road, Sector 67, Gurugram","lat":28.39106,"lon":77.06712,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN OCUS Quantam Sec51","address":"KFC U. No. G-8/9/10, GF Ocus Quantum Mall, Revenue Estate of samaspur, Sec 51, Gurugram","lat":28.42522,"lon":77.0681,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN ILDTrade Cntr Sohna Rd","address":"ILD Sohna Road, ILD Trade Centre, Sector 47 Shop No.25,26,27,28, Sohna Road, Gurugram","lat":28.42518,"lon":77.03938,"eta":"9:00:00 PM"},{"customer":"DEVYANI INTERNATIONAL LIMITED(HR)","outlet":"KFC GGN Ambi Mall R2 3F","address":"Ambi Mall-I, R-2, 3Rd Floor, Ambience Mall, Gurgaon","lat":28.50402,"lon":77.09692,"eta":"9:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Sec 22 Chandigarh","address":"SCO 2927 2928, 13 Ground floor Sec 22 Chandigarh, Near Hotel Diamond Hotel, Chandigarh","lat":30.72991,"lon":76.76707,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Phase 5 Mohali","address":"SCO-2 2nd floor, Phase 5 Mohali, Punjab 160059","lat":30.71647,"lon":76.71612,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Phase 11 Mohali","address":"SCO 12,13 Sabji Mandi, Phase 11 Mohali, Mohali-160062","lat":30.67983,"lon":76.74786,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Zirakpur","address":"SOC 17 18, 1st Floor Zirakpur, Near Easy Day Store, Mohali140603, Punjab-03","lat":30.65081,"lon":76.82198,"eta":"12:00:00 PM"},{"customer":"Rebel Foods Private Limited (Punjab)","outlet":"Kharar","address":"SCO-57,58, First Floor, City Heart, Chandigarh Road, Kharar-140301, Punjab","lat":30.75065,"lon":76.65291,"eta":"12:00:00 PM"}];
 
 const WAREHOUSE = { lat: 28.9385425, lon: 77.0825831 };
 
-const VEHICLES = [
-  { name: 'EV 650', capacity: 552 },
-  { name: 'TATA ACE', capacity: 688 },
-  { name: 'Bolero', capacity: 1032 },
-  { name: 'TATA 407', capacity: 1800 },
-  { name: '3.5 Tonner', capacity: 3150 }
-];
-
 let currentOrders = [];
-let selectedVehicle = { name: 'EV 650', capacity: 552 };
 let generatedRoutes = [];
+let activeZone = 'All';
+let zoneColorMap = {};
 
-// ─── Haversine distance ───────────────────────────────────────────────────
+// ─── Haversine ────────────────────────────────────────────────────────────
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -495,51 +736,9 @@ function haversine(lat1, lon1, lat2, lon2) {
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
+function roadDistance(lat1, lon1, lat2, lon2) { return haversine(lat1, lon1, lat2, lon2) * 1.35; }
 
-// Road distance with correction factor
-function roadDistance(lat1, lon1, lat2, lon2) {
-  return haversine(lat1, lon1, lat2, lon2) * 1.35;
-}
-
-const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImVmMjNiZjc0NzRlMjQ0OWY5YTI2YWIzZDU3M2Y2NTUwIiwiaCI6Im11cm11cjY0In0=';
-
-// Cache to avoid repeat API calls for same pairs
-const distCache = {};
-
-async function getRoadDistanceORS(waypoints) {
-  // waypoints: array of {lat, lon}
-  const key = waypoints.map(w => w.lat.toFixed(4)+','+w.lon.toFixed(4)).join('|');
-  if (distCache[key]) return distCache[key];
-
-  const coords = waypoints.map(w => [w.lon, w.lat]); // ORS uses [lon, lat]
-  try {
-    const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-hgv/json', {
-      method: 'POST',
-      headers: {
-        'Authorization': ORS_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ coordinates: coords, units: 'km' })
-    });
-    const data = await res.json();
-    if (data.routes && data.routes[0]) {
-      const summary = data.routes[0].summary;
-      const result = { distKm: summary.distance, durationMin: summary.duration / 60 };
-      distCache[key] = result;
-      return result;
-    }
-  } catch(e) {
-    console.warn('ORS API failed, falling back to haversine:', e);
-  }
-  // Fallback to haversine
-  let totalKm = 0;
-  for (let i = 1; i < waypoints.length; i++) {
-    totalKm += roadDistance(waypoints[i-1].lat, waypoints[i-1].lon, waypoints[i].lat, waypoints[i].lon);
-  }
-  return { distKm: totalKm, durationMin: (totalKm / 28) * 60 };
-}
-
-// ─── Fuzzy match ─────────────────────────────────────────────────────────
+// ─── Fuzzy match ──────────────────────────────────────────────────────────
 function similarity(a, b) {
   a = a.toLowerCase().replace(/[^a-z0-9]/g, '');
   b = b.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -553,19 +752,16 @@ function similarity(a, b) {
   }
   return matches / Math.max(shorter.length, 1);
 }
-
 function findBestMatch(name, masterList) {
   let best = null, bestScore = 0;
   for (const m of masterList) {
-    const s1 = similarity(name, m.outlet);
-    const s2 = similarity(name, m.customer);
-    const score = Math.max(s1, s2);
-    if (score > bestScore) { bestScore = score; best = m; }
+    const s = Math.max(similarity(name, m.outlet), similarity(name, m.customer));
+    if (s > bestScore) { bestScore = s; best = m; }
   }
   return { match: best, score: bestScore };
 }
 
-// ─── ETA to minutes from midnight ────────────────────────────────────────
+// ─── ETA helpers ──────────────────────────────────────────────────────────
 function etaToMinutes(eta) {
   if (!eta || eta === '-' || eta === 'nan' || eta === 'Closed') return null;
   const m = eta.match(/(\d+):(\d+)(?::(\d+))?\s*(AM|PM)?/i);
@@ -576,7 +772,6 @@ function etaToMinutes(eta) {
   if (ampm === 'AM' && h === 12) h = 0;
   return h * 60 + min;
 }
-
 function minutesToTime(mins) {
   if (mins < 0) mins += 24 * 60;
   const h = Math.floor(mins / 60) % 24;
@@ -586,14 +781,10 @@ function minutesToTime(mins) {
   return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-// ─── Nearest neighbour clustering ────────────────────────────────────────
+// ─── Clustering ───────────────────────────────────────────────────────────
 function clusterOutlets(orders, vehicleCap, maxStops, available) {
   let remaining = [...orders];
   const routes = [];
-  const sortedVehicles = [...available].sort((a, b) => a.capacity - b.capacity);
-  const smallestCap = sortedVehicles[0].capacity;
-
-  // Read settings
   const speed = parseFloat(document.getElementById('avg-speed').value) || 28;
   const trafficPct = parseFloat(document.getElementById('buf-traffic').value) || 20;
   const unloadMin = parseFloat(document.getElementById('buf-unload').value) || 20;
@@ -601,12 +792,11 @@ function clusterOutlets(orders, vehicleCap, maxStops, available) {
   const predepMin = parseFloat(document.getElementById('buf-predep').value) || 15;
   const fixedOverhead = loadMin + predepMin;
 
-  // Zone radius shrinks as vehicle fills up — tight zone when empty, expands when nearly full
   function getZoneRadius(loadKg, cap) {
-    const fillRatio = loadKg / cap;
-    if (fillRatio < 0.3) return 12;   // very tight zone when vehicle is mostly empty
-    if (fillRatio < 0.6) return 20;   // moderate zone at half full
-    return 40;                         // open up zone when vehicle is nearly full
+    const fr = loadKg / cap;
+    if (fr < 0.3) return 12;
+    if (fr < 0.6) return 20;
+    return 40;
   }
 
   while (remaining.length > 0) {
@@ -620,70 +810,33 @@ function clusterOutlets(orders, vehicleCap, maxStops, available) {
       let bestIdx = -1, bestScore = Infinity;
       const zoneRadius = getZoneRadius(loadKg, vehicleCap);
 
-      // First pass: zone-restricted, time-feasible candidates
-      for (let i = 0; i < remaining.length; i++) {
-        const o = remaining[i];
-        const kg = o.totalKg || 50;
-
-        // Hard limits: capacity and absolute max stops
-        if (loadKg + kg > vehicleCap) continue;
-        if (route.length >= maxStops) continue;
-
-        // Zone check — distance from first stop on this route
-        if (firstStop) {
-          const distFromFirst = haversine(firstStop.lat, firstStop.lon, o.lat, o.lon);
-          if (distFromFirst > zoneRadius) continue;
-        }
-
-        // Time feasibility
-        const distToNext = haversine(currentLat, currentLon, o.lat, o.lon) * 1.35;
-        const travelToNext = (distToNext / speed) * 60 * (1 + trafficPct / 100);
-        const projectedTravel = cumulativeTravelMin + travelToNext;
-        const projectedUnload = unloadMin * (route.length + 1);
-        const totalTimeNeeded = projectedTravel + projectedUnload + fixedOverhead;
-
-        const tightestETA = [...route, o].reduce((min, s) => {
-          const e = etaToMinutes(s.eta || s.etaRaw);
-          return (e !== null && e < min) ? e : min;
-        }, 9999);
-
-        // Key check: time must fit AND adding this stop must not push us over
-        if (tightestETA !== 9999 && totalTimeNeeded > tightestETA) continue;
-
-        // Score = distance from current position (nearest neighbour)
-        const score = haversine(currentLat, currentLon, o.lat, o.lon);
-        if (score < bestScore) { bestScore = score; bestIdx = i; }
-      }
-
-      // Second pass: if zone-restricted found nothing, open up — but still enforce time
-      if (bestIdx === -1) {
+      for (let pass = 0; pass < 2; pass++) {
         for (let i = 0; i < remaining.length; i++) {
           const o = remaining[i];
           const kg = o.totalKg || 50;
           if (loadKg + kg > vehicleCap) continue;
           if (route.length >= maxStops) continue;
-
+          if (pass === 0 && firstStop) {
+            const df = haversine(firstStop.lat, firstStop.lon, o.lat, o.lon);
+            if (df > zoneRadius) continue;
+          }
           const distToNext = haversine(currentLat, currentLon, o.lat, o.lon) * 1.35;
           const travelToNext = (distToNext / speed) * 60 * (1 + trafficPct / 100);
           const projectedTravel = cumulativeTravelMin + travelToNext;
           const projectedUnload = unloadMin * (route.length + 1);
           const totalTimeNeeded = projectedTravel + projectedUnload + fixedOverhead;
-
           const tightestETA = [...route, o].reduce((min, s) => {
             const e = etaToMinutes(s.eta || s.etaRaw);
             return (e !== null && e < min) ? e : min;
           }, 9999);
-
           if (tightestETA !== 9999 && totalTimeNeeded > tightestETA) continue;
-
           const score = haversine(currentLat, currentLon, o.lat, o.lon);
           if (score < bestScore) { bestScore = score; bestIdx = i; }
         }
+        if (bestIdx !== -1) break;
       }
 
-      // Nothing fits this vehicle — close the route
       if (bestIdx === -1) break;
-
       const chosen = remaining.splice(bestIdx, 1)[0];
       if (!firstStop) firstStop = chosen;
       const distToChosen = haversine(currentLat, currentLon, chosen.lat, chosen.lon) * 1.35;
@@ -696,11 +849,9 @@ function clusterOutlets(orders, vehicleCap, maxStops, available) {
 
     if (route.length > 0) routes.push({ stops: route, loadKg });
   }
-
   return routes;
 }
 
-// ─── Calculate dispatch time for a route ─────────────────────────────────
 function calcDispatch(route) {
   const speed = parseFloat(document.getElementById('avg-speed').value) || 28;
   const trafficPct = parseFloat(document.getElementById('buf-traffic').value) || 20;
@@ -708,14 +859,10 @@ function calcDispatch(route) {
   const loadMin = parseFloat(document.getElementById('buf-load').value) || 30;
   const predepMin = parseFloat(document.getElementById('buf-predep').value) || 15;
 
-  // Sort stops by ETA (earliest first)
   const sorted = [...route.stops].sort((a, b) => {
-    const ea = etaToMinutes(a.eta) || 9999;
-    const eb = etaToMinutes(b.eta) || 9999;
-    return ea - eb;
+    return (etaToMinutes(a.eta) || 9999) - (etaToMinutes(b.eta) || 9999);
   });
 
-  // Calculate total travel time from warehouse through all stops
   let totalTravelKm = 0;
   let prevLat = WAREHOUSE.lat, prevLon = WAREHOUSE.lon;
   for (const s of sorted) {
@@ -725,99 +872,80 @@ function calcDispatch(route) {
 
   const travelMin = (totalTravelKm / speed) * 60 * (1 + trafficPct / 100);
   const totalUnload = unloadMin * sorted.length;
-  const totalBuffer = loadMin + predepMin;
-
-  // Dispatch time = tightest ETA - travel - unloading - loading - predep
   const tightestETA = sorted.reduce((min, s) => {
     const e = etaToMinutes(s.eta);
     return e !== null && e < min ? e : min;
   }, 9999);
 
-  const dispatchMins = tightestETA - travelMin - totalUnload - totalBuffer;
-  const vehicleReadyMins = dispatchMins - 40; // 40 min before dispatch
-
+  const dispatchMins = tightestETA - travelMin - totalUnload - loadMin - predepMin;
   return {
     stops: sorted,
     travelKm: totalTravelKm,
     travelMin,
     totalUnload,
     dispatchTime: minutesToTime(Math.round(dispatchMins)),
-    vehicleReadyTime: minutesToTime(Math.round(vehicleReadyMins)),
+    vehicleReadyTime: minutesToTime(Math.round(dispatchMins - 40)),
     tightestETA: minutesToTime(tightestETA),
     dispatchMins
   };
 }
 
-// ─── UI helpers ──────────────────────────────────────────────────────────
+// ─── UI step management ───────────────────────────────────────────────────
 function setStep(n) {
   [1,2,3].forEach(i => {
     document.getElementById(`step-${i}`).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
     document.getElementById(`panel-${i}`).className = i === n ? 'active' : '';
   });
+  const sidebar = document.getElementById('zone-sidebar');
+  const exportBtn = document.getElementById('btn-export-top');
+  if (n === 3) {
+    sidebar.classList.add('visible');
+    exportBtn.classList.add('visible');
+  } else {
+    sidebar.classList.remove('visible');
+    exportBtn.classList.remove('visible');
+  }
 }
-
 function goToStep1() { setStep(1); }
 function goToStep2() { setStep(2); showUnmatched(); }
 function goToStep3() { setStep(3); }
 
 function toggleVehicle(el) {
   el.classList.toggle('selected');
-  const icon = el.querySelector('div');
-  icon.textContent = el.classList.contains('selected') ? '✅' : '☐';
+  el.querySelector('div').textContent = el.classList.contains('selected') ? '✅' : '☐';
 }
-
 function getAvailableVehicles() {
-  const btns = document.querySelectorAll('.vehicle-btn.selected');
-  return Array.from(btns).map(b => ({
-    name: b.dataset.name,
-    capacity: parseFloat(b.dataset.cap)
-  })).sort((a, b) => a.capacity - b.capacity);
+  return Array.from(document.querySelectorAll('.vehicle-btn.selected'))
+    .map(b => ({ name: b.dataset.name, capacity: parseFloat(b.dataset.cap) }))
+    .sort((a, b) => a.capacity - b.capacity);
 }
-
 function bestFitVehicle(loadKg, available) {
-  for (const v of available) {
-    if (v.capacity >= loadKg) return v;
-  }
+  for (const v of available) { if (v.capacity >= loadKg) return v; }
   return available[available.length - 1];
 }
 
-// ─── File upload ─────────────────────────────────────────────────────────
-document.getElementById('upload-zone').addEventListener('click', () => {
-  document.getElementById('order-file').click();
-});
-
+// ─── File upload ──────────────────────────────────────────────────────────
+document.getElementById('upload-zone').addEventListener('click', () => document.getElementById('order-file').click());
 document.getElementById('order-file').addEventListener('change', function() {
-  const file = this.files[0];
-  if (!file) return;
+  if (!this.files[0]) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    parseOrderCSV(text, file.name);
-  };
-  reader.readAsText(file);
+  reader.onload = e => parseOrderCSV(e.target.result, this.files[0].name);
+  reader.readAsText(this.files[0]);
 });
 
 function parseOrderCSV(text, filename) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
-
   const outletIdx = headers.findIndex(h => h.includes('outlet'));
-  const customerIdx = headers.findIndex(h => h.includes('customer'));
-  const kgIdx = headers.findIndex(h => h.includes('kg') || h.includes('weight') || h.includes('qty'));
+  const kgIdx = headers.findIndex(h => h.includes('kg') || h.includes('weight'));
   const etaIdx = headers.findIndex(h => h.includes('eta') || h.includes('time'));
 
   const orders = [];
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(',').map(c => c.trim().replace(/"/g,''));
     if (!cols[outletIdx]) continue;
-    orders.push({
-      outletName: cols[outletIdx] || '',
-      customerName: cols[customerIdx] || '',
-      totalKg: parseFloat(cols[kgIdx]) || 50,
-      etaRaw: cols[etaIdx] || '12:00:00 PM'
-    });
+    orders.push({ outletName: cols[outletIdx] || '', totalKg: parseFloat(cols[kgIdx]) || 50, etaRaw: cols[etaIdx] || '12:00:00 PM' });
   }
-
   processOrders(orders);
   document.getElementById('upload-status').className = '';
   document.getElementById('upload-status').innerHTML = `<div class="alert alert-success">✅ Loaded <strong>${orders.length} orders</strong> from ${filename}</div>`;
@@ -827,15 +955,12 @@ function parseOrderCSV(text, filename) {
 function useMasterAsDemo() {
   const valid = MASTER_DB.filter(o => o.eta && o.eta !== '-' && o.eta !== 'nan' && o.eta !== 'Closed');
   currentOrders = valid.map(o => ({
-    ...o,
-    outletName: o.outlet,
-    customerName: o.customer,
-    totalKg: Math.floor(Math.random() * 150) + 30, // random kg for demo
-    etaRaw: o.eta,
-    matched: true
+    ...o, outletName: o.outlet, customerName: o.customer,
+    totalKg: Math.floor(Math.random() * 150) + 30,
+    etaRaw: o.eta, matched: true
   }));
   document.getElementById('upload-status').className = '';
-  document.getElementById('upload-status').innerHTML = `<div class="alert alert-success">✅ Loaded <strong>${currentOrders.length} outlets</strong> from master database (demo mode — random kg assigned)</div>`;
+  document.getElementById('upload-status').innerHTML = `<div class="alert alert-success">✅ Loaded <strong>${currentOrders.length} outlets</strong> from master database (demo — random kg assigned)</div>`;
   document.getElementById('btn-next-1').disabled = false;
 }
 
@@ -844,15 +969,7 @@ function processOrders(orders) {
   for (const o of orders) {
     const { match, score } = findBestMatch(o.outletName, MASTER_DB);
     if (match && score > 0.4) {
-      currentOrders.push({
-        ...match,
-        outletName: o.outletName,
-        totalKg: o.totalKg,
-        etaRaw: o.etaRaw || match.eta,
-        eta: o.etaRaw || match.eta,
-        score,
-        matched: true
-      });
+      currentOrders.push({ ...match, outletName: o.outletName, totalKg: o.totalKg, etaRaw: o.etaRaw || match.eta, eta: o.etaRaw || match.eta, score, matched: true });
     } else {
       currentOrders.push({ ...o, matched: false, matchName: match ? match.outlet : 'No match' });
     }
@@ -861,22 +978,14 @@ function processOrders(orders) {
 
 function showUnmatched() {
   const unmatched = currentOrders.filter(o => !o.matched);
-  if (unmatched.length === 0) {
-    document.getElementById('unmatched-section').classList.add('hidden');
-    return;
-  }
+  if (unmatched.length === 0) { document.getElementById('unmatched-section').classList.add('hidden'); return; }
   document.getElementById('unmatched-section').classList.remove('hidden');
-  const tbody = document.getElementById('unmatched-body');
-  tbody.innerHTML = unmatched.map(o => `
-    <tr>
-      <td>${o.outletName || o.outlet || '-'}</td>
-      <td style="color:var(--text-secondary)">${o.matchName || '-'}</td>
-      <td><span class="tag tag-red">Skipped</span></td>
-    </tr>
+  document.getElementById('unmatched-body').innerHTML = unmatched.map(o => `
+    <tr><td>${o.outletName || '-'}</td><td style="color:var(--text-secondary)">${o.matchName || '-'}</td><td><span class="tag tag-red">Skipped</span></td></tr>
   `).join('');
 }
 
-// ─── Generate routes ─────────────────────────────────────────────────────
+// ─── Generate routes ──────────────────────────────────────────────────────
 function generateRoutes() {
   goToStep3();
   document.getElementById('loading').classList.remove('hidden');
@@ -884,41 +993,153 @@ function generateRoutes() {
 
   setTimeout(() => {
     const matched = currentOrders.filter(o => o.matched !== false && o.lat && o.lon);
-    const maxStops = 999; // No artificial stop limit — capacity and time decide
     const available = getAvailableVehicles();
+    if (available.length === 0) { alert('Please select at least one vehicle.'); goToStep2(); return; }
 
-    if (available.length === 0) {
-      alert('Please select at least one vehicle type.');
-      goToStep2();
-      return;
-    }
-
-    // Use largest available vehicle for clustering (to minimise number of routes)
     const largestCap = available[available.length - 1].capacity;
-    const clusters = clusterOutlets(matched, largestCap, maxStops, available);
+    const clusters = clusterOutlets(matched, largestCap, 999, available);
 
+    // Assign zones to each route's stops and the route itself
     generatedRoutes = clusters.map((c, i) => {
       const fit = bestFitVehicle(c.loadKg, available);
-      return {
-        id: i + 1,
-        vehicle: fit.name,
-        capacity: fit.capacity,
-        ...calcDispatch(c),
-        loadKg: c.loadKg
-      };
+      const dispatched = calcDispatch(c);
+      // Determine dominant zone for the route
+      const zoneCounts = {};
+      dispatched.stops.forEach(s => {
+        const z = detectZone(s);
+        zoneCounts[z] = (zoneCounts[z] || 0) + 1;
+      });
+      const dominantZone = Object.entries(zoneCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || 'Other';
+      return { id: i + 1, vehicle: fit.name, capacity: fit.capacity, ...dispatched, loadKg: c.loadKg, zone: dominantZone };
     });
 
+    // Build zone color map
+    const allZones = [...new Set(generatedRoutes.map(r => r.zone))].sort();
+    zoneColorMap = {};
+    allZones.forEach((z, i) => { zoneColorMap[z] = getZoneColor(i); });
+
+    renderSidebar(allZones);
     renderResults(generatedRoutes, matched.length);
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('results-content').classList.remove('hidden');
   }, 800);
 }
 
+// ─── Sidebar ──────────────────────────────────────────────────────────────
+function renderSidebar(zones) {
+  const list = document.getElementById('zone-list');
+  const totalRoutes = generatedRoutes.length;
+  const allItem = `
+    <div class="zone-item active" data-zone="All" onclick="selectZone('All', this)">
+      <div class="zone-dot" style="background:#888;"></div>
+      <span class="zone-name">All Zones</span>
+      <span class="zone-badge">${totalRoutes}</span>
+    </div>`;
+
+  const zoneItems = zones.map(z => {
+    const count = generatedRoutes.filter(r => r.zone === z).length;
+    const color = zoneColorMap[z];
+    return `
+      <div class="zone-item" data-zone="${z}" onclick="selectZone('${z}', this)">
+        <div class="zone-dot" style="background:${color};"></div>
+        <span class="zone-name" title="${z}">${z}</span>
+        <span class="zone-badge">${count}</span>
+      </div>`;
+  }).join('');
+
+  list.innerHTML = allItem + zoneItems;
+}
+
+function filterZoneList(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#zone-list .zone-item').forEach(item => {
+    const zone = item.dataset.zone;
+    item.style.display = zone === 'All' || zone.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function selectZone(zone, el) {
+  activeZone = zone;
+  document.querySelectorAll('#zone-list .zone-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  // Update active pill
+  document.querySelectorAll('.zone-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.zone === zone);
+  });
+  renderFilteredRoutes();
+}
+
+function selectZoneFromPill(zone) {
+  activeZone = zone;
+  document.querySelectorAll('.zone-pill').forEach(p => p.classList.toggle('active', p.dataset.zone === zone));
+  document.querySelectorAll('#zone-list .zone-item').forEach(i => {
+    i.classList.toggle('active', i.dataset.zone === zone);
+  });
+  renderFilteredRoutes();
+}
+
+function renderFilteredRoutes() {
+  const filtered = activeZone === 'All' ? generatedRoutes : generatedRoutes.filter(r => r.zone === activeZone);
+  const container = document.getElementById('routes-container');
+  const title = document.getElementById('routes-card-title');
+  title.textContent = activeZone === 'All'
+    ? 'Vehicle Routes & Dispatch Schedule'
+    : `Routes — ${activeZone} (${filtered.length} vehicle${filtered.length !== 1 ? 's' : ''})`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="no-routes-msg"><strong>No routes in this zone</strong>Try selecting a different zone from the sidebar.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((r, i) => {
+    const loadPct = Math.round((r.loadKg / r.capacity) * 100);
+    const zoneColor = zoneColorMap[r.zone] || '#888';
+    return `
+      <div class="route-card">
+        <div class="route-header" onclick="toggleRoute('rc-${r.id}')">
+          <div class="route-title">
+            🚛 Vehicle ${r.id}
+            <span class="tag tag-green">${r.stops.length} stops</span>
+            <span class="tag tag-blue">${Math.round(r.loadKg)} kg</span>
+            <span class="route-zone-tag" style="background:${zoneColor}22;color:${zoneColor};border:1px solid ${zoneColor}44;">${r.zone}</span>
+          </div>
+          <div class="route-meta">
+            <span>Ready <strong>${r.vehicleReadyTime}</strong></span>
+            <span class="dispatch-badge">Dispatch ${r.dispatchTime}</span>
+            <span>▼</span>
+          </div>
+        </div>
+        <div class="route-body" id="rc-${r.id}">
+          <div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);flex-wrap:wrap;">
+            <span>🛣 ${Math.round(r.travelKm)} km</span>
+            <span>⏱ ~${Math.round(r.travelMin)} min travel</span>
+            <span>📦 ${loadPct}% capacity</span>
+            <span>⚡ ${r.vehicle}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${loadPct}%"></div></div>
+          <div style="margin-top:12px;">
+            ${r.stops.map((s, si) => `
+              <div class="stop-row">
+                <div class="stop-num">${si + 1}</div>
+                <div style="flex:1;min-width:0;">
+                  <div class="stop-name">${s.outlet || s.outletName}</div>
+                  <div class="stop-customer">${s.customer || s.customerName || ''}</div>
+                </div>
+                <div class="stop-details">
+                  <div class="stop-eta">ETA ${s.eta || s.etaRaw}</div>
+                  <div class="stop-kg">${s.totalKg ? Math.round(s.totalKg)+' kg' : ''}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
 function renderResults(routes, totalOutlets) {
   const totalKg = routes.reduce((s, r) => s + r.loadKg, 0);
   const earliestDispatch = routes.reduce((min, r) => r.dispatchMins < min ? r.dispatchMins : min, 9999);
-
-  // Vehicle mix count
   const vehicleMix = {};
   routes.forEach(r => { vehicleMix[r.vehicle] = (vehicleMix[r.vehicle] || 0) + 1; });
   const mixText = Object.entries(vehicleMix).map(([v, c]) => `${c}x ${v}`).join(', ');
@@ -929,84 +1150,42 @@ function renderResults(routes, totalOutlets) {
     <div class="stat"><div class="stat-label">Total Load</div><div class="stat-value">${Math.round(totalKg)}</div><div class="stat-sub">kg dispatched</div></div>
     <div class="stat"><div class="stat-label">First Dispatch</div><div class="stat-value">${minutesToTime(Math.round(earliestDispatch))}</div><div class="stat-sub">earliest vehicle</div></div>
   `;
-
   document.getElementById('summary-text').innerHTML =
     `✅ Generated <strong>${routes.length} routes</strong> covering <strong>${totalOutlets} outlets</strong>. Vehicle mix: <strong>${mixText}</strong>.`;
 
-  const container = document.getElementById('routes-container');
-  container.innerHTML = routes.map((r, i) => {
-    const loadPct = Math.round((r.loadKg / r.capacity) * 100);
-    return `
-      <div class="route-card">
-        <div class="route-header" onclick="toggleRoute(${i})">
-          <div class="route-title">
-            🚛 Vehicle ${r.id}
-            <span class="tag tag-green">${r.stops.length} stops</span>
-            <span class="tag tag-blue">${Math.round(r.loadKg)} kg</span>
-          </div>
-          <div class="route-meta">
-            <span>Ready by <strong>${r.vehicleReadyTime}</strong></span>
-            <span class="dispatch-badge">Dispatch ${r.dispatchTime}</span>
-            <span>▼</span>
-          </div>
-        </div>
-        <div class="route-body" id="route-body-${i}">
-          <div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:var(--text-secondary);">
-            <span>🛣 ${Math.round(r.travelKm)} km road distance</span>
-            <span>⏱ ~${Math.round(r.travelMin)} min travel</span>
-            <span>📦 Load: ${loadPct}% of capacity</span>
-            <span>⚡ Vehicle ready by ${r.vehicleReadyTime}</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${loadPct}%"></div></div>
-          <div style="margin-top:12px;">
-            ${r.stops.map((s, si) => `
-              <div class="stop-row">
-                <div class="stop-num">${si + 1}</div>
-                <div>
-                  <div class="stop-name">${s.outlet || s.outletName}</div>
-                  <div class="stop-customer">${s.customer || s.customerName}</div>
-                  <div class="stop-customer" style="margin-top:2px;font-size:10px;">${s.address ? s.address.substring(0,60)+'...' : ''}</div>
-                </div>
-                <div class="stop-details">
-                  <div class="stop-eta">ETA ${s.eta || s.etaRaw}</div>
-                  <div class="stop-kg">${s.totalKg ? Math.round(s.totalKg)+' kg' : ''}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  // Zone pills
+  const allZones = [...new Set(routes.map(r => r.zone))].sort();
+  const pillsEl = document.getElementById('zone-pills');
+  pillsEl.innerHTML = `
+    <span class="zone-pill active" data-zone="All" onclick="selectZoneFromPill('All')">
+      <span class="zone-pill-dot" style="background:#888;"></span>All
+    </span>` +
+    allZones.map(z => {
+      const color = zoneColorMap[z];
+      const count = routes.filter(r => r.zone === z).length;
+      return `<span class="zone-pill" data-zone="${z}" onclick="selectZoneFromPill('${z}')">
+        <span class="zone-pill-dot" style="background:${color};"></span>${z} <span style="opacity:.65;font-size:11px;">${count}</span>
+      </span>`;
+    }).join('');
+  document.getElementById('zone-filter-bar').classList.add('visible');
+
+  renderFilteredRoutes();
 }
 
-function toggleRoute(i) {
-  const body = document.getElementById(`route-body-${i}`);
-  body.classList.toggle('open');
+function toggleRoute(id) {
+  const body = document.getElementById(id);
+  if (body) body.classList.toggle('open');
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────
 function exportToCSV() {
-  const rows = [['Vehicle', 'Stop No.', 'Customer Name', 'Outlet Name', 'Address', 'ETA', 'Total Kg', 'Dispatch Time', 'Vehicle Ready Time', 'Route Distance (km)', 'Route Load (kg)']];
-
+  if (!generatedRoutes.length) return;
+  const rows = [['Vehicle', 'Zone', 'Stop No.', 'Customer Name', 'Outlet Name', 'Address', 'ETA', 'Total Kg', 'Dispatch Time', 'Vehicle Ready Time', 'Route Distance (km)', 'Route Load (kg)']];
   for (const r of generatedRoutes) {
     r.stops.forEach((s, i) => {
-      rows.push([
-        `Vehicle ${r.id} (${r.vehicle})`,
-        i + 1,
-        s.customer || s.customerName,
-        s.outlet || s.outletName,
-        s.address || '',
-        s.eta || s.etaRaw,
-        s.totalKg || '',
-        r.dispatchTime,
-        r.vehicleReadyTime,
-        Math.round(r.travelKm),
-        Math.round(r.loadKg)
-      ]);
+      rows.push([`Vehicle ${r.id} (${r.vehicle})`, r.zone, i + 1, s.customer || s.customerName, s.outlet || s.outletName, s.address || '', s.eta || s.etaRaw, s.totalKg || '', r.dispatchTime, r.vehicleReadyTime, Math.round(r.travelKm), Math.round(r.loadKg)]);
     });
   }
-
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -1018,7 +1197,6 @@ function exportToCSV() {
   URL.revokeObjectURL(url);
 }
 
-// Set today's date
 document.getElementById('delivery-date').value = new Date().toISOString().slice(0,10);
 </script>
 </body>
